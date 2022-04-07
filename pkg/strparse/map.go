@@ -20,23 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package strparse
 
 import (
-	"testing"
-
-	"github.com/Drumato/goparsecomb/pkg/strparse"
-	"github.com/stretchr/testify/assert"
+	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
-func TestTakewhile1(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile1(subP)
+type mapParser[SO parser.ParseOutput, O parser.ParseOutput] struct {
+	sub parser.Parser[string, SO]
+	fn  func(SO) O
+}
 
-	i, o, err := p.Parse("aaaabaa")
-	assert.NoError(t, err)
-	assert.Equal(t, "aaaa", o)
-	assert.Equal(t, "baa", i)
+func Map[SO parser.ParseOutput, O parser.ParseOutput](sub parser.Parser[string, SO], fn func(SO) O) parser.Parser[string, O] {
+	return &mapParser[SO, O]{sub: sub, fn: fn}
+}
+
+func (p *mapParser[SO, O]) Parse(input string) (string, O, parser.ParseError) {
+	i, o, err := p.sub.Parse(input)
+	if err != nil {
+		return i, p.fn(o), err
+	}
+
+	return i, p.fn(o), err
 }

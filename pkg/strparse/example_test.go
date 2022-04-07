@@ -28,11 +28,24 @@ import (
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 )
 
+func ExampleMap() {
+	subsubP := strparse.Rune('a')
+	subP := strparse.TakeWhile1(subsubP)
+	p := strparse.Map(subP, func(s string) int { return len(s) })
+	i, o, err := p.Parse("aaaabaaaa")
+	fmt.Println(i)
+	fmt.Printf("%d\n", o)
+	fmt.Println(err)
+
+	// Output:
+	//
+	// baaaa
+	// 4
+	// <nil>
+}
+
 func ExampleTakeWhile1() {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile1(subP)
+	p := strparse.TakeWhile1(strparse.Rune('a'))
 
 	i, o, err := p.Parse("aaaabaa")
 	fmt.Println(i)
@@ -42,6 +55,21 @@ func ExampleTakeWhile1() {
 	// Output:
 	// baa
 	// aaaa
+	// <nil>
+}
+
+func ExampleSatisfy() {
+	i, o, err := strparse.Satisfy(func(ch rune) bool {
+		return ch == 'a'
+	}).Parse("abc")
+	fmt.Println(i)
+	fmt.Printf("%c\n", o)
+	fmt.Println(err)
+
+	// Output:
+	//
+	// bc
+	// a
 	// <nil>
 }
 

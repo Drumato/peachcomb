@@ -41,8 +41,6 @@ type runeParser struct {
 	expected rune
 }
 
-var _ parser.Parser[string, rune] = &runeParser{}
-
 // Parse implements Parser[string, rune] interface
 func (p *runeParser) Parse(input string) (string, rune, parser.ParseError) {
 	if len(input) == 0 {
