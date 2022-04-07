@@ -19,48 +19,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+// package strparse provides a string parser and utilities.
 package strparse
-
-import "strings"
-
-// takeWhile1Parser is the actual implementation of Parser interface
-type takeWhile1Parser struct {
-	sub Parser[rune]
-}
-
-var _ Parser[string] = &takeWhile1Parser{}
-
-// TakeWhile1 initializes a parser that applies the given sub-parser several times.
-// if the sub parser fails to parse and the count of application times is 0
-// TakeWhile1 parser return an error.
-func TakeWhile1(sub Parser[rune]) Parser[string] {
-	return &takeWhile1Parser{sub: sub}
-}
-
-// Parse implements Parser[string] interface
-func (p *takeWhile1Parser) Parse(input ParseInput) (ParseInput, string, ParseError) {
-	if len(input) == 0 {
-		return input, "", &NoLeftInputToParseError{}
-	}
-
-	count := 0
-	var subI ParseInput
-	var subO rune
-	var subErr error
-	var output strings.Builder
-	for {
-		subI, subO, subErr = p.sub.Parse(input[count:])
-		if subErr != nil {
-			break
-		}
-		count++
-
-		output.WriteRune(subO)
-	}
-
-	if count == 0 {
-		return subI, output.String(), subErr
-	}
-
-	return subI, output.String(), nil
-}
