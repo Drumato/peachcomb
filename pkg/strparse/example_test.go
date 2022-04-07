@@ -36,7 +36,6 @@ func ExampleMap() {
 	fmt.Println(i)
 	fmt.Printf("%d\n", o)
 	fmt.Println(err)
-
 	// Output:
 	//
 	// baaaa
@@ -51,7 +50,6 @@ func ExampleTakeWhile1() {
 	fmt.Println(i)
 	fmt.Println(o)
 	fmt.Println(err)
-
 	// Output:
 	// baa
 	// aaaa
@@ -65,7 +63,6 @@ func ExampleSatisfy() {
 	fmt.Println(i)
 	fmt.Printf("%c\n", o)
 	fmt.Println(err)
-
 	// Output:
 	//
 	// bc
@@ -78,7 +75,6 @@ func ExampleRune() {
 	fmt.Println(i)
 	fmt.Printf("%c\n", o)
 	fmt.Println(err)
-
 	// Output:
 	//
 	// bc
@@ -91,7 +87,6 @@ func ExampleTag() {
 	fmt.Println(i)
 	fmt.Println(o)
 	fmt.Println(err)
-
 	// Output:
 	//
 	// ato

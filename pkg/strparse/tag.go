@@ -44,7 +44,7 @@ type tagParser struct {
 // Parse implements Parser[string, string] interface
 func (p *tagParser) Parse(input string) (string, string, parser.ParseError) {
 	if len(input) < len(p.tag) {
-		return input, "", &parser.NoLeftInputToParseError[string]{}
+		return input, "", &parser.NoLeftInputToParseError{}
 	}
 
 	unmatched := !strings.HasPrefix(input, p.tag)

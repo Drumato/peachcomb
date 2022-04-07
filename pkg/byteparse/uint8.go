@@ -20,53 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse
+package byteparse
 
 import (
-	"fmt"
-
 	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
-// Rune initializes a parser that consumes one rune.
-// expected is the expected rune that you want to consume
-func Rune(expected rune) parser.Parser[string, rune] {
-	return &runeParser{
-		expected: expected,
-	}
+func UInt8() parser.Parser[[]byte, byte] {
+	return &uint8Parser{}
 }
 
-// runeParser is the actual impelementation of Parser interface
-type runeParser struct {
-	expected rune
-}
+type uint8Parser struct{}
 
-// Parse implements Parser[string, rune] interface
-func (p *runeParser) Parse(input string) (string, rune, parser.ParseError) {
+var _ parser.Parser[[]byte, byte] = &uint8Parser{}
+
+func (p *uint8Parser) Parse(input []byte) ([]byte, byte, parser.ParseError) {
 	if len(input) == 0 {
-		return input, 0, &parser.NoLeftInputToParseError{}
+		return nil, 0, &parser.NoLeftInputToParseError{}
 	}
 
-	ch := []rune(input)[0]
-	matched := ch == p.expected
-
-	if !matched {
-		return input, 0, &UnexpectedRuneError{actual: ch, expected: p.expected}
-	}
-
-	// input[1:] doesn't split multi-byte string properly
-	// so we should cast it into []rune first.
-	rest := []rune(input)[1:]
-	return string(rest), p.expected, nil
-}
-
-// UnexpectedRuneError notifies the head of the given input is unexpected.
-type UnexpectedRuneError struct {
-	actual   rune
-	expected rune
-}
-
-// Error implements error interface.
-func (e *UnexpectedRuneError) Error() string {
-	return fmt.Sprintf("expected '%c' but got '%c'", e.expected, e.actual)
+	head := input[0]
+	return input[1:], head, nil
 }

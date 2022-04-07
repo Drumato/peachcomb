@@ -46,7 +46,7 @@ type Predicate func(ch rune) bool
 // Parse implements Parser[string, rune, rune] interface
 func (p *satisfyParser) Parse(input string) (string, rune, parser.ParseError) {
 	if len(input) == 0 {
-		return input, 0, &parser.NoLeftInputToParseError[string]{}
+		return input, 0, &parser.NoLeftInputToParseError{}
 	}
 
 	ch := []rune(input)[0]

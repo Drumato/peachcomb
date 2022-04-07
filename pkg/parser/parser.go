@@ -49,9 +49,9 @@ func ErrorIs[T ParseError](err error, ty T) bool {
 }
 
 // NoLeftInputToParseError notifies the given input to parser is empty
-type NoLeftInputToParseError[I ParseInput] struct{}
+type NoLeftInputToParseError struct{}
 
 // Error implements error interface
-func (e *NoLeftInputToParseError[ParseInput]) Error() string {
+func (e *NoLeftInputToParseError) Error() string {
 	return "no left input to parse"
 }

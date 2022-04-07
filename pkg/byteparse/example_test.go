@@ -20,50 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse
+package byteparse_test
 
 import (
-	"strings"
+	"fmt"
 
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/goparsecomb/pkg/byteparse"
 )
 
-// takeWhile1Parser is the actual implementation of Parser interface
-type takeWhile1Parser struct {
-	sub parser.Parser[string, rune]
-}
-
-// TakeWhile1 initializes a parser that applies the given sub-parser several times.
-// if the sub parser fails to parse and the count of application times is 0
-// TakeWhile1 parser return an error.
-func TakeWhile1(sub parser.Parser[string, rune]) parser.Parser[string, string] {
-	return &takeWhile1Parser{sub: sub}
-}
-
-// Parse implements Parser[string] interface
-func (p *takeWhile1Parser) Parse(input string) (string, string, parser.ParseError) {
-	if len(input) == 0 {
-		return input, "", &parser.NoLeftInputToParseError{}
-	}
-
-	count := 0
-	var subI string
-	var subO rune
-	var subErr error
-	var output strings.Builder
-	for {
-		subI, subO, subErr = p.sub.Parse(input[count:])
-		if subErr != nil {
-			break
-		}
-		count++
-
-		output.WriteRune(subO)
-	}
-
-	if count == 0 {
-		return subI, output.String(), subErr
-	}
-
-	return subI, output.String(), nil
+func ExampleUInt8() {
+	i, o, err := byteparse.UInt8().Parse([]byte{0x01, 0x02, 0x03})
+	fmt.Println(i)
+	fmt.Println(o)
+	fmt.Println(err)
+	// Output:
+	//
+	// [2 3]
+	// 1
+	// <nil>
 }

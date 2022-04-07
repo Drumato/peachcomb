@@ -20,50 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse
+package byteparse
 
 import (
-	"strings"
-
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"encoding/binary"
+	"unsafe"
 )
 
-// takeWhile1Parser is the actual implementation of Parser interface
-type takeWhile1Parser struct {
-	sub parser.Parser[string, rune]
+var (
+	envEndian binary.ByteOrder
+)
+
+func init() {
+	determineEnvEndian()
 }
 
-// TakeWhile1 initializes a parser that applies the given sub-parser several times.
-// if the sub parser fails to parse and the count of application times is 0
-// TakeWhile1 parser return an error.
-func TakeWhile1(sub parser.Parser[string, rune]) parser.Parser[string, string] {
-	return &takeWhile1Parser{sub: sub}
-}
+func determineEnvEndian() {
+	buf := [4]byte{}
+	const value = uint32(0x01234567)
+	bufPtr := unsafe.Pointer(&buf[0])
+	// assignment
+	*(*uint32)(bufPtr) = value
 
-// Parse implements Parser[string] interface
-func (p *takeWhile1Parser) Parse(input string) (string, string, parser.ParseError) {
-	if len(input) == 0 {
-		return input, "", &parser.NoLeftInputToParseError{}
+	switch buf {
+	case [4]byte{0x67, 0x45, 0x23, 0x01}:
+		envEndian = binary.LittleEndian
+	case [4]byte{0x01, 0x23, 0x45, 0x67}:
+		envEndian = binary.BigEndian
+	default:
+		panic("Could not determine native endianness.")
 	}
-
-	count := 0
-	var subI string
-	var subO rune
-	var subErr error
-	var output strings.Builder
-	for {
-		subI, subO, subErr = p.sub.Parse(input[count:])
-		if subErr != nil {
-			break
-		}
-		count++
-
-		output.WriteRune(subO)
-	}
-
-	if count == 0 {
-		return subI, output.String(), subErr
-	}
-
-	return subI, output.String(), nil
 }
