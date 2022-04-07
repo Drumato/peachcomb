@@ -24,49 +24,43 @@ package strparse
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
-// Rune initializes a parser that consumes one rune.
-// expected is the expected rune that you want to consume
-func Rune(expected rune) parser.Parser[string, rune] {
-	return &runeParser{
-		expected: expected,
+// Tag initializes a parser that checks the input starts with the tag prefix.
+func Tag(tag string) parser.Parser[string, string] {
+	return &tagParser{
+		tag: tag,
 	}
 }
 
-// runeParser is the actual impelementation of Parser interface
-type runeParser struct {
-	expected rune
+// tagParser is the actual implementation of Parser interface
+type tagParser struct {
+	tag string
 }
 
-// Parse implements Parser[string, rune] interface
-func (p *runeParser) Parse(input string) (string, rune, parser.ParseError) {
-	if len(input) == 0 {
-		return input, 0, &parser.NoLeftInputToParseError[string]{}
+// Parse implements Parser[string, string] interface
+func (p *tagParser) Parse(input string) (string, string, parser.ParseError) {
+	if len(input) < len(p.tag) {
+		return input, "", &parser.NoLeftInputToParseError[string]{}
 	}
 
-	ch := []rune(input)[0]
-	matched := ch == p.expected
-
-	if !matched {
-		return input, 0, &UnexpectedRuneError{actual: ch, expected: p.expected}
+	unmatched := !strings.HasPrefix(input, p.tag)
+	if unmatched {
+		return input, "", &UnexpectedPrefixError{expected: p.tag}
 	}
 
-	// input[1:] doesn't split multi-byte string properly
-	// so we should cast it into []rune first.
-	rest := []rune(input)[1:]
-	return string(rest), p.expected, nil
+	return strings.TrimPrefix(input, p.tag), p.tag, nil
 }
 
-// UnexpectedRuneError notifies the head of the given input is unexpected.
-type UnexpectedRuneError struct {
-	actual   rune
-	expected rune
+// UnexpectedPrefixError notifies the prefix of the given input is unexpected.
+type UnexpectedPrefixError struct {
+	expected string
 }
 
 // Error implements error interface.
-func (e *UnexpectedRuneError) Error() string {
-	return fmt.Sprintf("expected '%c' but got '%c'", e.expected, e.actual)
+func (e *UnexpectedPrefixError) Error() string {
+	return fmt.Sprintf("expected \"%s\" prefix", e.expected)
 }
