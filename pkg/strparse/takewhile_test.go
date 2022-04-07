@@ -1,7 +1,6 @@
 package strparse_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/Drumato/goparsecomb/pkg/strparse"
