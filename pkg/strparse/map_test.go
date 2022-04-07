@@ -20,17 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse
+package strparse_test
 
-// Parser is an abstract parser that parses string.
-// All parsers in package strparse implements this interface.
-type Parser[O ParseOutput] interface {
-	// Parse parses the input and convert the consumed substr to O actually
-	Parse(input ParseInput) (ParseInput, O, ParseError)
+import (
+	"testing"
+
+	"github.com/Drumato/goparsecomb/pkg/strparse"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestMap(t *testing.T) {
+	subP := strparse.Rune('a')
+	p := strparse.Map(subP, func(ch rune) bool { return ch == 'a' })
+
+	i, o, err := p.Parse("abc")
+	assert.NoError(t, err)
+	assert.Equal(t, "bc", i)
+	assert.Equal(t, true, o)
 }
-
-// ParseInput is the input of Parser interface.
-type ParseInput string
-
-// ParseOutput is the actual type of the parser's output
-type ParseOutput interface{}

@@ -22,10 +22,14 @@
 
 package strparse
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/Drumato/goparsecomb/pkg/parser"
+)
 
 // Satisfy initializes a parser that checks the head of the input satisfies the predicate.
-func Satisfy(pred Predicate) Parser[rune] {
+func Satisfy(pred Predicate) parser.Parser[string, rune] {
 	return &satisfyParser{
 		pred: pred,
 	}
@@ -36,15 +40,13 @@ type satisfyParser struct {
 	pred Predicate
 }
 
-var _ Parser[rune] = &satisfyParser{}
-
 // Predicate is the condition that satisfyParser uses for consuming one rune.
 type Predicate func(ch rune) bool
 
-// Parse implements Parser[rune] interface
-func (p *satisfyParser) Parse(input ParseInput) (ParseInput, rune, ParseError) {
+// Parse implements Parser[string, rune, rune] interface
+func (p *satisfyParser) Parse(input string) (string, rune, parser.ParseError) {
 	if len(input) == 0 {
-		return input, 0, &NoLeftInputToParseError{}
+		return input, 0, &parser.NoLeftInputToParseError[string]{}
 	}
 
 	ch := []rune(input)[0]
@@ -56,7 +58,7 @@ func (p *satisfyParser) Parse(input ParseInput) (ParseInput, rune, ParseError) {
 	// input[1:] doesn't split multi-byte string properly
 	// so we should cast it into []rune first.
 	rest := []rune(input)[1:]
-	return ParseInput(rest), ch, nil
+	return string(rest), ch, nil
 }
 
 // NotsatisfiedError notifies that the given predicate is not satisfied.
@@ -65,7 +67,7 @@ type NotSatisfiedError struct {
 	actual rune
 }
 
-var _ ParseError = &NotSatisfiedError{}
+var _ parser.ParseError = &NotSatisfiedError{}
 
 // Error implements error interface
 func (e *NotSatisfiedError) Error() string {

@@ -20,20 +20,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package parser
 
-import (
-	"testing"
+// Parser is an abstract parser that parses string.
+// All parsers in package strparse implements this interface.
+type Parser[I ParseInput, O ParseOutput] interface {
+	// Parse parses the input and convert the consumed substr to O actually
+	Parse(input I) (I, O, ParseError)
+}
 
-	"github.com/Drumato/goparsecomb/pkg/strparse"
-	"github.com/stretchr/testify/assert"
-)
+// ParseInput is the input of Parser interface.
+type ParseInput interface {
+	string | []byte
+}
 
-func TestSatisfy(t *testing.T) {
-	p := strparse.Satisfy(func(ch rune) bool { return ch == 'a' })
-	i, o, err := p.Parse("abc")
+// ParseOutput is the actual type of the parser's output
+type ParseOutput interface{}
 
-	assert.NoError(t, err)
-	assert.Equal(t, "bc", i)
-	assert.Equal(t, 'a', o)
+// ParseError represents the error of parsers in package strparse
+type ParseError interface {
+	error
+}
+
+// ErrorIs checks the given error implements ParseError interface.
+func ErrorIs[T ParseError](err error, ty T) bool {
+	_, ok := err.(T)
+	return ok
+}
+
+// NoLeftInputToParseError notifies the given input to parser is empty
+type NoLeftInputToParseError[I ParseInput] struct{}
+
+// Error implements error interface
+func (e *NoLeftInputToParseError[ParseInput]) Error() string {
+	return "no left input to parse"
 }

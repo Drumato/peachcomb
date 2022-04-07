@@ -30,12 +30,13 @@ import (
 )
 
 func TestTakewhile1(t *testing.T) {
-	p := strparse.TakeWhile1(strparse.Satisfy(func(ch rune) bool {
+	subP := strparse.Satisfy(func(ch rune) bool {
 		return ch == 'a'
-	}))
+	})
+	p := strparse.TakeWhile1(subP)
 
-	i, o, err := p.Parse(strparse.ParseInput("aaaabaa"))
+	i, o, err := p.Parse("aaaabaa")
 	assert.NoError(t, err)
 	assert.Equal(t, "aaaa", o)
-	assert.Equal(t, strparse.ParseInput("baa"), i)
+	assert.Equal(t, "baa", i)
 }

@@ -22,38 +22,24 @@
 
 package strparse
 
-import "fmt"
+import (
+	"github.com/Drumato/goparsecomb/pkg/parser"
+)
 
-// ParseError represents the error of parsers in package strparse
-type ParseError interface {
-	error
+type mapParser[SO parser.ParseOutput, O parser.ParseOutput] struct {
+	sub parser.Parser[string, SO]
+	fn  func(SO) O
 }
 
-// ErrorIs checks the given error implements ParseError interface.
-func ErrorIs[T ParseError](err error, ty T) bool {
-	_, ok := err.(T)
-	return ok
+func Map[SO parser.ParseOutput, O parser.ParseOutput](sub parser.Parser[string, SO], fn func(SO) O) parser.Parser[string, O] {
+	return &mapParser[SO, O]{sub: sub, fn: fn}
 }
 
-// NoLeftInputToParseError notifies the given input to parser is empty
-type NoLeftInputToParseError struct{}
+func (p *mapParser[SO, O]) Parse(input string) (string, O, parser.ParseError) {
+	i, o, err := p.sub.Parse(input)
+	if err != nil {
+		return i, p.fn(o), err
+	}
 
-var _ ParseError = &NoLeftInputToParseError{}
-
-// Error implements error interface
-func (e *NoLeftInputToParseError) Error() string {
-	return "no left input to parse"
-}
-
-// UnexpectedRuneError notifies the head of the given input is unexpected in a parser
-type UnexpectedRuneError struct {
-	actual   rune
-	expected rune
-}
-
-var _ ParseError = &UnexpectedRuneError{}
-
-// Error implements error interface
-func (e *UnexpectedRuneError) Error() string {
-	return fmt.Sprintf("expected %c but got %c", e.expected, e.actual)
+	return i, p.fn(o), err
 }

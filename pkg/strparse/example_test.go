@@ -28,19 +28,60 @@ import (
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 )
 
-func ExampleTakeWhile1() {
-	var subParser strparse.Parser[rune] = strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	var p strparse.Parser[string] = strparse.TakeWhile1(subParser)
+func ExampleMap() {
+	subsubP := strparse.Rune('a')
+	subP := strparse.TakeWhile1(subsubP)
+	p := strparse.Map(subP, func(s string) int { return len(s) })
+	i, o, err := p.Parse("aaaabaaaa")
+	fmt.Println(i)
+	fmt.Printf("%d\n", o)
+	fmt.Println(err)
 
-	i, o, err := p.Parse(strparse.ParseInput("aaaabaa"))
+	// Output:
+	//
+	// baaaa
+	// 4
+	// <nil>
+}
+
+func ExampleTakeWhile1() {
+	p := strparse.TakeWhile1(strparse.Rune('a'))
+
+	i, o, err := p.Parse("aaaabaa")
 	fmt.Println(i)
 	fmt.Println(o)
-	fmt.Println(strparse.ErrorIs(err, &strparse.NoLeftInputToParseError{}))
+	fmt.Println(err)
 
 	// Output:
 	// baa
 	// aaaa
-	// false
+	// <nil>
+}
+
+func ExampleSatisfy() {
+	i, o, err := strparse.Satisfy(func(ch rune) bool {
+		return ch == 'a'
+	}).Parse("abc")
+	fmt.Println(i)
+	fmt.Printf("%c\n", o)
+	fmt.Println(err)
+
+	// Output:
+	//
+	// bc
+	// a
+	// <nil>
+}
+
+func ExampleRune() {
+	i, o, err := strparse.Rune('a').Parse("abc")
+	fmt.Println(i)
+	fmt.Printf("%c\n", o)
+	fmt.Println(err)
+
+	// Output:
+	//
+	// bc
+	// a
+	// <nil>
 }
