@@ -31,9 +31,9 @@ import (
 
 func TestSatisfy(t *testing.T) {
 	p := strparse.Satisfy(func(ch rune) bool { return ch == 'a' })
-	i, o, err := p.Parse(strparse.ParseInput("abc"))
+	i, o, err := p.Parse("abc")
 
 	assert.NoError(t, err)
-	assert.Equal(t, strparse.ParseInput("bc"), i)
+	assert.Equal(t, "bc", i)
 	assert.Equal(t, 'a', o)
 }

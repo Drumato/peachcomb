@@ -20,9 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse
+package parser
 
-import "fmt"
+// Parser is an abstract parser that parses string.
+// All parsers in package strparse implements this interface.
+type Parser[I ParseInput, O ParseOutput] interface {
+	// Parse parses the input and convert the consumed substr to O actually
+	Parse(input I) (I, O, ParseError)
+}
+
+// ParseInput is the input of Parser interface.
+type ParseInput interface {
+	string | []byte
+}
+
+// ParseOutput is the actual type of the parser's output
+type ParseOutput interface{}
 
 // ParseError represents the error of parsers in package strparse
 type ParseError interface {
@@ -36,24 +49,9 @@ func ErrorIs[T ParseError](err error, ty T) bool {
 }
 
 // NoLeftInputToParseError notifies the given input to parser is empty
-type NoLeftInputToParseError struct{}
-
-var _ ParseError = &NoLeftInputToParseError{}
+type NoLeftInputToParseError[I ParseInput] struct{}
 
 // Error implements error interface
-func (e *NoLeftInputToParseError) Error() string {
+func (e *NoLeftInputToParseError[ParseInput]) Error() string {
 	return "no left input to parse"
-}
-
-// UnexpectedRuneError notifies the head of the given input is unexpected in a parser
-type UnexpectedRuneError struct {
-	actual   rune
-	expected rune
-}
-
-var _ ParseError = &UnexpectedRuneError{}
-
-// Error implements error interface
-func (e *UnexpectedRuneError) Error() string {
-	return fmt.Sprintf("expected %c but got %c", e.expected, e.actual)
 }

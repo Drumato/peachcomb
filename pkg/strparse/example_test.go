@@ -29,18 +29,31 @@ import (
 )
 
 func ExampleTakeWhile1() {
-	var subParser strparse.Parser[rune] = strparse.Satisfy(func(ch rune) bool {
+	subP := strparse.Satisfy(func(ch rune) bool {
 		return ch == 'a'
 	})
-	var p strparse.Parser[string] = strparse.TakeWhile1(subParser)
+	p := strparse.TakeWhile1(subP)
 
-	i, o, err := p.Parse(strparse.ParseInput("aaaabaa"))
+	i, o, err := p.Parse("aaaabaa")
 	fmt.Println(i)
 	fmt.Println(o)
-	fmt.Println(strparse.ErrorIs(err, &strparse.NoLeftInputToParseError{}))
+	fmt.Println(err)
 
 	// Output:
 	// baa
 	// aaaa
-	// false
+	// <nil>
+}
+
+func ExampleRune() {
+	i, o, err := strparse.Rune('a').Parse("abc")
+	fmt.Println(i)
+	fmt.Printf("%c\n", o)
+	fmt.Println(err)
+
+	// Output:
+	//
+	// bc
+	// a
+	// <nil>
 }

@@ -34,8 +34,8 @@ func TestTakewhile1(t *testing.T) {
 		return ch == 'a'
 	}))
 
-	i, o, err := p.Parse(strparse.ParseInput("aaaabaa"))
+	i, o, err := p.Parse("aaaabaa")
 	assert.NoError(t, err)
 	assert.Equal(t, "aaaa", o)
-	assert.Equal(t, strparse.ParseInput("baa"), i)
+	assert.Equal(t, "baa", i)
 }

@@ -22,9 +22,15 @@
 
 package strparse
 
+import (
+	"fmt"
+
+	"github.com/Drumato/goparsecomb/pkg/parser"
+)
+
 // Rune initializes a parser that consumes one rune.
 // expected is the expected rune that you want to consume
-func Rune(expected rune) Parser[rune] {
+func Rune(expected rune) parser.Parser[string, rune] {
 	return &runeParser{
 		expected: expected,
 	}
@@ -35,12 +41,12 @@ type runeParser struct {
 	expected rune
 }
 
-var _ Parser[rune] = &runeParser{}
+var _ parser.Parser[string, rune] = &runeParser{}
 
-// Parse implements Parser[rune] interface
-func (p *runeParser) Parse(input ParseInput) (ParseInput, rune, ParseError) {
+// Parse implements Parser[string, rune] interface
+func (p *runeParser) Parse(input string) (string, rune, parser.ParseError) {
 	if len(input) == 0 {
-		return input, 0, &NoLeftInputToParseError{}
+		return input, 0, &parser.NoLeftInputToParseError[string]{}
 	}
 
 	ch := []rune(input)[0]
@@ -53,5 +59,14 @@ func (p *runeParser) Parse(input ParseInput) (ParseInput, rune, ParseError) {
 	// input[1:] doesn't split multi-byte string properly
 	// so we should cast it into []rune first.
 	rest := []rune(input)[1:]
-	return ParseInput(rest), p.expected, nil
+	return string(rest), p.expected, nil
+}
+
+type UnexpectedRuneError struct {
+	actual   rune
+	expected rune
+}
+
+func (e *UnexpectedRuneError) Error() string {
+	return fmt.Sprintf("expected '%c' but got '%c'", e.expected, e.actual)
 }

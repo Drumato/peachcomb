@@ -22,30 +22,32 @@
 
 package strparse
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/Drumato/goparsecomb/pkg/parser"
+)
 
 // takeWhile1Parser is the actual implementation of Parser interface
 type takeWhile1Parser struct {
-	sub Parser[rune]
+	sub parser.Parser[string, rune]
 }
-
-var _ Parser[string] = &takeWhile1Parser{}
 
 // TakeWhile1 initializes a parser that applies the given sub-parser several times.
 // if the sub parser fails to parse and the count of application times is 0
 // TakeWhile1 parser return an error.
-func TakeWhile1(sub Parser[rune]) Parser[string] {
+func TakeWhile1(sub parser.Parser[string, rune]) parser.Parser[string, string] {
 	return &takeWhile1Parser{sub: sub}
 }
 
 // Parse implements Parser[string] interface
-func (p *takeWhile1Parser) Parse(input ParseInput) (ParseInput, string, ParseError) {
+func (p *takeWhile1Parser) Parse(input string) (string, string, parser.ParseError) {
 	if len(input) == 0 {
-		return input, "", &NoLeftInputToParseError{}
+		return input, "", &parser.NoLeftInputToParseError[string]{}
 	}
 
 	count := 0
-	var subI ParseInput
+	var subI string
 	var subO rune
 	var subErr error
 	var output strings.Builder
