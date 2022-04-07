@@ -29,7 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Takewhile1(t *testing.T) {
+func TestTakewhile1(t *testing.T) {
 	p := strparse.TakeWhile1(strparse.Satisfy(func(ch rune) bool {
 		return ch == 'a'
 	}))
