@@ -20,26 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse
+package combinator_test
 
 import (
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"fmt"
+
+	"github.com/Drumato/goparsecomb/pkg/combinator"
+	"github.com/Drumato/goparsecomb/pkg/strparse"
 )
 
-type mapParser[SO parser.ParseOutput, O parser.ParseOutput] struct {
-	sub parser.Parser[string, SO]
-	fn  func(SO) O
-}
-
-func Map[SO parser.ParseOutput, O parser.ParseOutput](sub parser.Parser[string, SO], fn func(SO) O) parser.Parser[string, O] {
-	return &mapParser[SO, O]{sub: sub, fn: fn}
-}
-
-func (p *mapParser[SO, O]) Parse(input string) (string, O, parser.ParseError) {
-	i, o, err := p.sub.Parse(input)
-	if err != nil {
-		return i, p.fn(o), err
-	}
-
-	return i, p.fn(o), err
+func ExampleMap() {
+	subsubP := strparse.Rune('a')
+	subP := strparse.TakeWhile1(subsubP)
+	p := combinator.Map(subP, func(s string) int { return len(s) })
+	i, o, err := p.Parse("aaaabaaaa")
+	fmt.Println(i)
+	fmt.Printf("%d\n", o)
+	fmt.Println(err)
+	// Output:
+	//
+	// baaaa
+	// 4
+	// <nil>
 }

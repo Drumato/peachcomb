@@ -20,18 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package combinator_test
 
 import (
 	"testing"
 
+	"github.com/Drumato/goparsecomb/pkg/combinator"
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMap(t *testing.T) {
 	subP := strparse.Rune('a')
-	p := strparse.Map(subP, func(ch rune) bool { return ch == 'a' })
+	p := combinator.Map(subP, func(ch rune) bool { return ch == 'a' })
 
 	i, o, err := p.Parse("abc")
 	assert.NoError(t, err)

@@ -20,61 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package combinator
 
 import (
-	"fmt"
-
-	"github.com/Drumato/goparsecomb/pkg/strparse"
+	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
-func ExampleTakeWhile1() {
-	p := strparse.TakeWhile1(strparse.Rune('a'))
-
-	i, o, err := p.Parse("aaaabaa")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// baa
-	// aaaa
-	// <nil>
+type mapParser[I parser.ParseInput, SO parser.ParseOutput, O parser.ParseOutput] struct {
+	sub parser.Parser[I, SO]
+	fn  func(SO) O
 }
 
-func ExampleSatisfy() {
-	i, o, err := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	}).Parse("abc")
-	fmt.Println(i)
-	fmt.Printf("%c\n", o)
-	fmt.Println(err)
-	// Output:
-	//
-	// bc
-	// a
-	// <nil>
+func Map[I parser.ParseInput, SO parser.ParseOutput, O parser.ParseOutput](sub parser.Parser[I, SO], fn func(SO) O) parser.Parser[I, O] {
+	return &mapParser[I, SO, O]{sub: sub, fn: fn}
 }
 
-func ExampleRune() {
-	i, o, err := strparse.Rune('a').Parse("abc")
-	fmt.Println(i)
-	fmt.Printf("%c\n", o)
-	fmt.Println(err)
-	// Output:
-	//
-	// bc
-	// a
-	// <nil>
-}
+func (p *mapParser[I, SO, O]) Parse(input I) (I, O, parser.ParseError) {
+	i, o, err := p.sub.Parse(input)
+	if err != nil {
+		return i, p.fn(o), err
+	}
 
-func ExampleTag() {
-	i, o, err := strparse.Tag("Drum").Parse("Drumato")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	//
-	// ato
-	// Drum
-	// <nil>
+	return i, p.fn(o), err
 }
