@@ -23,53 +23,21 @@
 package combinator_test
 
 import (
-	"fmt"
+	"testing"
 
 	"github.com/Drumato/goparsecomb/pkg/combinator"
 	"github.com/Drumato/goparsecomb/pkg/strparse"
+	"github.com/stretchr/testify/assert"
 )
 
-func ExampleMap() {
-	subsubP := strparse.Rune('a')
-	subP := strparse.TakeWhile1(subsubP)
-	p := combinator.Map(subP, func(s string) int { return len(s) })
-	i, o, err := p.Parse("aaaabaaaa")
-	fmt.Println(i)
-	fmt.Printf("%d\n", o)
-	fmt.Println(err)
-	// Output:
-	// baaaa
-	// 4
-	// <nil>
-}
-
-func ExampleAlt() {
-	p1 := strparse.Rune('a')
-	p2 := strparse.Rune('b')
-	p := strparse.TakeWhile1(combinator.Alt(p1, p2))
-
-	i, o, err := p.Parse("abababc")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// c
-	// ababab
-	// <nil>
-}
-
-func ExampleDelimited() {
-	begin := strparse.Rune('(')
-	end := strparse.Rune(')')
+func TestDelimited(t *testing.T) {
+	begin := strparse.Rune('"')
 	contents := strparse.Digit1()
-	p := combinator.Delimited(begin, contents, end)
+	end := strparse.Rune('"')
 
-	i, o, err := p.Parse("(12321)")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	//
-	// 12321
-	// <nil>
+	p := combinator.Delimited(begin, contents, end)
+	i, o, err := p.Parse("\"12345\"")
+	assert.NoError(t, err)
+	assert.Equal(t, "", i)
+	assert.Equal(t, "12345", o)
 }

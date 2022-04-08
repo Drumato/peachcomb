@@ -20,56 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package combinator_test
+package combinator
 
-import (
-	"fmt"
+import "github.com/Drumato/goparsecomb/pkg/parser"
 
-	"github.com/Drumato/goparsecomb/pkg/combinator"
-	"github.com/Drumato/goparsecomb/pkg/strparse"
-)
-
-func ExampleMap() {
-	subsubP := strparse.Rune('a')
-	subP := strparse.TakeWhile1(subsubP)
-	p := combinator.Map(subP, func(s string) int { return len(s) })
-	i, o, err := p.Parse("aaaabaaaa")
-	fmt.Println(i)
-	fmt.Printf("%d\n", o)
-	fmt.Println(err)
-	// Output:
-	// baaaa
-	// 4
-	// <nil>
+func Delimited[
+	I parser.ParseInput,
+	O1 parser.ParseOutput,
+	O2 parser.ParseOutput,
+	O3 parser.ParseOutput,
+](
+	begin parser.Parser[I, O1],
+	contents parser.Parser[I, O2],
+	end parser.Parser[I, O3],
+) parser.Parser[I, O2] {
+	return &delimitedParser[I, O1, O2, O3]{begin: begin, contents: contents, end: end}
 }
 
-func ExampleAlt() {
-	p1 := strparse.Rune('a')
-	p2 := strparse.Rune('b')
-	p := strparse.TakeWhile1(combinator.Alt(p1, p2))
-
-	i, o, err := p.Parse("abababc")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// c
-	// ababab
-	// <nil>
+type delimitedParser[
+	I parser.ParseInput,
+	O1 parser.ParseOutput,
+	O2 parser.ParseOutput,
+	O3 parser.ParseOutput,
+] struct {
+	begin    parser.Parser[I, O1]
+	contents parser.Parser[I, O2]
+	end      parser.Parser[I, O3]
 }
 
-func ExampleDelimited() {
-	begin := strparse.Rune('(')
-	end := strparse.Rune(')')
-	contents := strparse.Digit1()
-	p := combinator.Delimited(begin, contents, end)
+func (p *delimitedParser[I, O1, O2, O3]) Parse(input I) (I, O2, parser.ParseError) {
+	var o2 O2
+	rest, _, err := p.begin.Parse(input)
+	if err != nil {
+		return rest, o2, err
+	}
 
-	i, o, err := p.Parse("(12321)")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	//
-	// 12321
-	// <nil>
+	rest, o2, err = p.contents.Parse(rest)
+	if err != nil {
+		return rest, o2, err
+	}
+
+	rest, _, err = p.end.Parse(rest)
+	if err != nil {
+		return rest, o2, err
+	}
+
+	return rest, o2, nil
 }
