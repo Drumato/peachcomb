@@ -20,56 +20,54 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package combinator_test
+package main
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/Drumato/goparsecomb/pkg/combinator"
+	"github.com/Drumato/goparsecomb/pkg/parser"
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 )
 
-func ExampleMap() {
-	subsubP := strparse.Rune('a')
-	subP := strparse.TakeWhile1(subsubP)
-	p := combinator.Map(subP, func(s string) int { return len(s) })
-	i, o, err := p.Parse("aaaabaaaa")
-	fmt.Println(i)
-	fmt.Printf("%d\n", o)
-	fmt.Println(err)
-	// Output:
-	// baaaa
-	// 4
-	// <nil>
+type jsonValue interface {
 }
 
-func ExampleAlt() {
-	p1 := strparse.Rune('a')
-	p2 := strparse.Rune('b')
-	p := strparse.TakeWhile1(combinator.Alt(p1, p2))
+type jsonValueString string
+type jsonValueInteger int
 
-	i, o, err := p.Parse("abababc")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// c
-	// ababab
-	// <nil>
+func jsonValueParser() parser.Parser[string, jsonValue] {
+	return combinator.Alt(jsonStringValueParser(), jsonNumberValueParser())
 }
 
-func ExampleDelimited() {
-	begin := strparse.Rune('(')
-	end := strparse.Rune(')')
-	contents := strparse.Digit1()
-	p := combinator.Delimited(begin, contents, end)
+func jsonStringValueParser() parser.Parser[string, jsonValue] {
+	begin := strparse.Rune('"')
+	contents := strparse.TakeWhile0(strparse.Satisfy(func(ch rune) bool { return ch != '"' }))
+	end := strparse.Rune('"')
+	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s string) jsonValue {
+		return jsonValueString(s)
+	})
 
-	i, o, err := p.Parse("(12321)")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	//
-	// 12321
-	// <nil>
+	return p
+}
+
+func jsonNumberValueParser() parser.Parser[string, jsonValue] {
+	return combinator.Map(strparse.Digit1(), func(s string) jsonValue {
+		v, _ := strconv.ParseInt(s, 10, 64)
+		return jsonValueInteger(v)
+	})
+}
+
+func parseJSONNumberValue(input string) (string, jsonValueInteger, parser.ParseError) {
+	p := strparse.Digit1()
+	i, o, err := p.Parse(input)
+	if err != nil {
+		return i, jsonValueInteger(0), err
+	}
+
+	v, err := strconv.ParseInt(o, 10, 64)
+	if err != nil {
+		return i, jsonValueInteger(0), err
+	}
+	return i, jsonValueInteger(v), nil
 }

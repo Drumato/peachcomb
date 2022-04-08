@@ -20,35 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package main
 
 import (
-	"testing"
-
-	"github.com/Drumato/goparsecomb/pkg/strparse"
-	"github.com/stretchr/testify/assert"
+	"fmt"
+	"os"
 )
 
-func TestTakewhile1(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile1(subP)
+const s = `"hoge"`
 
-	i, o, err := p.Parse("aaaabaa")
-	assert.NoError(t, err)
-	assert.Equal(t, "aaaa", o)
-	assert.Equal(t, "baa", i)
-}
+func main() {
+	_, v, err := jsonValueParser().Parse(s)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
+		os.Exit(1)
+	}
 
-func TestTakewhile0(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile0(subP)
-
-	i, o, err := p.Parse("baa")
-	assert.NoError(t, err)
-	assert.Equal(t, "", o)
-	assert.Equal(t, "baa", i)
+	fmt.Println(v)
 }

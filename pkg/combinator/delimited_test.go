@@ -20,86 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package combinator_test
 
 import (
-	"fmt"
+	"testing"
 
+	"github.com/Drumato/goparsecomb/pkg/combinator"
 	"github.com/Drumato/goparsecomb/pkg/strparse"
+	"github.com/stretchr/testify/assert"
 )
 
-func ExampleTakeWhile0() {
-	p := strparse.TakeWhile0(strparse.Rune('a'))
+func TestDelimited(t *testing.T) {
+	begin := strparse.Rune('"')
+	contents := strparse.Digit1()
+	end := strparse.Rune('"')
 
-	i, o, err := p.Parse("baaaa")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// baaaa
-	//
-	// <nil>
-}
-
-func ExampleTakeWhile1() {
-	p := strparse.TakeWhile1(strparse.Rune('a'))
-
-	i, o, err := p.Parse("aaaabaa")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// baa
-	// aaaa
-	// <nil>
-}
-
-func ExampleSatisfy() {
-	i, o, err := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	}).Parse("abc")
-	fmt.Println(i)
-	fmt.Printf("%c\n", o)
-	fmt.Println(err)
-	// Output:
-	//
-	// bc
-	// a
-	// <nil>
-}
-
-func ExampleRune() {
-	i, o, err := strparse.Rune('a').Parse("abc")
-	fmt.Println(i)
-	fmt.Printf("%c\n", o)
-	fmt.Println(err)
-	// Output:
-	//
-	// bc
-	// a
-	// <nil>
-}
-
-func ExampleTag() {
-	i, o, err := strparse.Tag("Drum").Parse("Drumato")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	//
-	// ato
-	// Drum
-	// <nil>
-}
-
-func ExampleDigit1() {
-	i, o, err := strparse.Digit1().Parse("112233abc")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	//
-	// abc
-	// 112233
-	// <nil>
+	p := combinator.Delimited(begin, contents, end)
+	i, o, err := p.Parse("\"12345\"")
+	assert.NoError(t, err)
+	assert.Equal(t, "", i)
+	assert.Equal(t, "12345", o)
 }

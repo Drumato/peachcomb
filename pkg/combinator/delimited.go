@@ -20,35 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package combinator
 
-import (
-	"testing"
+import "github.com/Drumato/goparsecomb/pkg/parser"
 
-	"github.com/Drumato/goparsecomb/pkg/strparse"
-	"github.com/stretchr/testify/assert"
-)
-
-func TestTakewhile1(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile1(subP)
-
-	i, o, err := p.Parse("aaaabaa")
-	assert.NoError(t, err)
-	assert.Equal(t, "aaaa", o)
-	assert.Equal(t, "baa", i)
+func Delimited[
+	I parser.ParseInput,
+	O1 parser.ParseOutput,
+	O2 parser.ParseOutput,
+	O3 parser.ParseOutput,
+](
+	begin parser.Parser[I, O1],
+	contents parser.Parser[I, O2],
+	end parser.Parser[I, O3],
+) parser.Parser[I, O2] {
+	return &delimitedParser[I, O1, O2, O3]{begin: begin, contents: contents, end: end}
 }
 
-func TestTakewhile0(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile0(subP)
+type delimitedParser[
+	I parser.ParseInput,
+	O1 parser.ParseOutput,
+	O2 parser.ParseOutput,
+	O3 parser.ParseOutput,
+] struct {
+	begin    parser.Parser[I, O1]
+	contents parser.Parser[I, O2]
+	end      parser.Parser[I, O3]
+}
 
-	i, o, err := p.Parse("baa")
-	assert.NoError(t, err)
-	assert.Equal(t, "", o)
-	assert.Equal(t, "baa", i)
+func (p *delimitedParser[I, O1, O2, O3]) Parse(input I) (I, O2, parser.ParseError) {
+	var o2 O2
+	rest, _, err := p.begin.Parse(input)
+	if err != nil {
+		return rest, o2, err
+	}
+
+	rest, o2, err = p.contents.Parse(rest)
+	if err != nil {
+		return rest, o2, err
+	}
+
+	rest, _, err = p.end.Parse(rest)
+	if err != nil {
+		return rest, o2, err
+	}
+
+	return rest, o2, nil
 }

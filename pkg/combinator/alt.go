@@ -20,35 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package combinator
 
-import (
-	"testing"
+import "github.com/Drumato/goparsecomb/pkg/parser"
 
-	"github.com/Drumato/goparsecomb/pkg/strparse"
-	"github.com/stretchr/testify/assert"
-)
-
-func TestTakewhile1(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile1(subP)
-
-	i, o, err := p.Parse("aaaabaa")
-	assert.NoError(t, err)
-	assert.Equal(t, "aaaa", o)
-	assert.Equal(t, "baa", i)
+func Alt[I parser.ParseInput, O parser.ParseOutput](parsers ...parser.Parser[I, O]) parser.Parser[I, O] {
+	return &altParser[I, O]{parsers: parsers}
 }
 
-func TestTakewhile0(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile0(subP)
+type altParser[I parser.ParseInput, O parser.ParseOutput] struct {
+	parsers []parser.Parser[I, O]
+}
 
-	i, o, err := p.Parse("baa")
-	assert.NoError(t, err)
-	assert.Equal(t, "", o)
-	assert.Equal(t, "baa", i)
+func (p *altParser[I, O]) Parse(input I) (I, O, parser.ParseError) {
+	var subI I
+	var subO O
+	var err parser.ParseError
+
+	for _, subP := range p.parsers {
+		subI, subO, err = subP.Parse(input)
+		if err == nil {
+			return subI, subO, nil
+		}
+	}
+
+	return subI, subO, &AllParsersFailledError{}
+}
+
+// AllParsersFailledError notifies all of given parsers are failed to parse.
+type AllParsersFailledError struct{}
+
+// Error implements error interface.
+func (e *AllParsersFailledError) Error() string {
+	return "all of given parser failed to parse"
 }

@@ -28,20 +28,26 @@ import (
 	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
-// takeWhile1Parser is the actual implementation of Parser interface
-type takeWhile1Parser struct {
+// takeWhileParser is the actual implementation of Parser interface
+type takeWhileParser struct {
 	sub parser.Parser[string, rune]
+	min uint
+}
+
+// TakeWhile0 initializes a parser that applies the given sub-parser several times.
+func TakeWhile0(sub parser.Parser[string, rune]) parser.Parser[string, string] {
+	return &takeWhileParser{sub: sub, min: 0}
 }
 
 // TakeWhile1 initializes a parser that applies the given sub-parser several times.
 // if the sub parser fails to parse and the count of application times is 0
 // TakeWhile1 parser return an error.
 func TakeWhile1(sub parser.Parser[string, rune]) parser.Parser[string, string] {
-	return &takeWhile1Parser{sub: sub}
+	return &takeWhileParser{sub: sub, min: 1}
 }
 
 // Parse implements Parser[string] interface
-func (p *takeWhile1Parser) Parse(input string) (string, string, parser.ParseError) {
+func (p *takeWhileParser) Parse(input string) (string, string, parser.ParseError) {
 	if len(input) == 0 {
 		return input, "", &parser.NoLeftInputToParseError{}
 	}
@@ -52,6 +58,10 @@ func (p *takeWhile1Parser) Parse(input string) (string, string, parser.ParseErro
 	var subErr error
 	var output strings.Builder
 	for {
+		if count >= len(input) {
+			break
+		}
+
 		subI, subO, subErr = p.sub.Parse(input[count:])
 		if subErr != nil {
 			break
@@ -61,7 +71,7 @@ func (p *takeWhile1Parser) Parse(input string) (string, string, parser.ParseErro
 		output.WriteRune(subO)
 	}
 
-	if count == 0 {
+	if count < int(p.min) {
 		return subI, output.String(), subErr
 	}
 

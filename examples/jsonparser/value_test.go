@@ -20,35 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package main
 
 import (
 	"testing"
 
-	"github.com/Drumato/goparsecomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTakewhile1(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile1(subP)
-
-	i, o, err := p.Parse("aaaabaa")
+func TestParseJSONValueOnString(t *testing.T) {
+	i, o, err := jsonValueParser().Parse("\"Drumato\"")
 	assert.NoError(t, err)
-	assert.Equal(t, "aaaa", o)
-	assert.Equal(t, "baa", i)
+	assert.Equal(t, jsonValueString("Drumato"), o)
+	assert.Equal(t, "", i)
 }
 
-func TestTakewhile0(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile0(subP)
-
-	i, o, err := p.Parse("baa")
+func TestParseJSONValueOnNumber(t *testing.T) {
+	i, o, err := jsonValueParser().Parse("12345")
 	assert.NoError(t, err)
-	assert.Equal(t, "", o)
-	assert.Equal(t, "baa", i)
+	assert.Equal(t, jsonValueInteger(12345), o)
+	assert.Equal(t, "", i)
 }
