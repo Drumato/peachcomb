@@ -20,35 +20,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package strparse
 
-import (
-	"testing"
+import "github.com/Drumato/goparsecomb/pkg/parser"
 
-	"github.com/Drumato/goparsecomb/pkg/strparse"
-	"github.com/stretchr/testify/assert"
-)
-
-func TestTakewhile1(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile1(subP)
-
-	i, o, err := p.Parse("aaaabaa")
-	assert.NoError(t, err)
-	assert.Equal(t, "aaaa", o)
-	assert.Equal(t, "baa", i)
+func Digit1() parser.Parser[string, string] {
+	return &digit1Parser{}
 }
 
-func TestTakewhile0(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := strparse.TakeWhile0(subP)
+type digit1Parser struct{}
 
-	i, o, err := p.Parse("baa")
-	assert.NoError(t, err)
-	assert.Equal(t, "", o)
-	assert.Equal(t, "baa", i)
+func (p *digit1Parser) Parse(input string) (string, string, parser.ParseError) {
+	i, o, err := TakeWhile1(Satisfy(isDigit)).Parse(input)
+	if err != nil {
+		return input, "", err
+	}
+
+	return i, o, nil
+}
+
+func isDigit(ch rune) bool {
+	switch ch {
+	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+		return true
+	default:
+		return false
+	}
+
 }
