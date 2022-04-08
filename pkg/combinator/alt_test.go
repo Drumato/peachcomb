@@ -23,37 +23,25 @@
 package combinator_test
 
 import (
-	"fmt"
+	"testing"
 
 	"github.com/Drumato/goparsecomb/pkg/combinator"
 	"github.com/Drumato/goparsecomb/pkg/strparse"
+	"github.com/stretchr/testify/assert"
 )
 
-func ExampleMap() {
-	subsubP := strparse.Rune('a')
-	subP := strparse.TakeWhile1(subsubP)
-	p := combinator.Map(subP, func(s string) int { return len(s) })
-	i, o, err := p.Parse("aaaabaaaa")
-	fmt.Println(i)
-	fmt.Printf("%d\n", o)
-	fmt.Println(err)
-	// Output:
-	// baaaa
-	// 4
-	// <nil>
-}
-
-func ExampleAlt() {
+func TestAlt(t *testing.T) {
 	p1 := strparse.Rune('a')
 	p2 := strparse.Rune('b')
-	p := strparse.TakeWhile1(combinator.Alt(p1, p2))
+	p := combinator.Alt(p1, p2)
 
-	i, o, err := p.Parse("abababc")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// c
-	// ababab
-	// <nil>
+	i, o, err := p.Parse("a")
+	assert.NoError(t, err)
+	assert.Equal(t, "", i)
+	assert.Equal(t, 'a', o)
+
+	i, o, err = p.Parse("b")
+	assert.NoError(t, err)
+	assert.Equal(t, "", i)
+	assert.Equal(t, 'b', o)
 }

@@ -20,40 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package combinator_test
+package combinator
 
-import (
-	"fmt"
+import "github.com/Drumato/goparsecomb/pkg/parser"
 
-	"github.com/Drumato/goparsecomb/pkg/combinator"
-	"github.com/Drumato/goparsecomb/pkg/strparse"
-)
-
-func ExampleMap() {
-	subsubP := strparse.Rune('a')
-	subP := strparse.TakeWhile1(subsubP)
-	p := combinator.Map(subP, func(s string) int { return len(s) })
-	i, o, err := p.Parse("aaaabaaaa")
-	fmt.Println(i)
-	fmt.Printf("%d\n", o)
-	fmt.Println(err)
-	// Output:
-	// baaaa
-	// 4
-	// <nil>
+func Alt[I parser.ParseInput, O parser.ParseOutput](parsers ...parser.Parser[I, O]) parser.Parser[I, O] {
+	return &altParser[I, O]{parsers: parsers}
 }
 
-func ExampleAlt() {
-	p1 := strparse.Rune('a')
-	p2 := strparse.Rune('b')
-	p := strparse.TakeWhile1(combinator.Alt(p1, p2))
+type altParser[I parser.ParseInput, O parser.ParseOutput] struct {
+	parsers []parser.Parser[I, O]
+}
 
-	i, o, err := p.Parse("abababc")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// c
-	// ababab
-	// <nil>
+func (p *altParser[I, O]) Parse(input I) (I, O, parser.ParseError) {
+	var subI I
+	var subO O
+	var err parser.ParseError
+
+	for _, subP := range p.parsers {
+		subI, subO, err = subP.Parse(input)
+		if err == nil {
+			return subI, subO, nil
+		}
+	}
+
+	return subI, subO, &AllParsersFailledError{}
+}
+
+// AllParsersFailledError notifies all of given parsers are failed to parse.
+type AllParsersFailledError struct{}
+
+// Error implements error interface.
+func (e *AllParsersFailledError) Error() string {
+	return "all of given parser failed to parse"
 }
