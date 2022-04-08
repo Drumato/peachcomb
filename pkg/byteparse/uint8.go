@@ -26,15 +26,15 @@ import (
 	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
-func UInt8() parser.Parser[[]byte, byte] {
+func UInt8() parser.Parser[[]byte, uint8] {
 	return &uint8Parser{}
 }
 
 type uint8Parser struct{}
 
-var _ parser.Parser[[]byte, byte] = &uint8Parser{}
+var _ parser.Parser[[]byte, uint8] = &uint8Parser{}
 
-func (p *uint8Parser) Parse(input []byte) ([]byte, byte, parser.ParseError) {
+func (p *uint8Parser) Parse(input []byte) ([]byte, uint8, parser.ParseError) {
 	if len(input) == 0 {
 		return nil, 0, &parser.NoLeftInputToParseError{}
 	}

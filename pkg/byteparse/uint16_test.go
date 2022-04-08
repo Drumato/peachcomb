@@ -24,31 +24,17 @@ package byteparse_test
 
 import (
 	"encoding/binary"
-	"fmt"
+	"testing"
 
 	"github.com/Drumato/goparsecomb/pkg/byteparse"
+	"github.com/stretchr/testify/assert"
 )
 
-func ExampleUInt8() {
-	i, o, err := byteparse.UInt8().Parse([]byte{0x01, 0x02, 0x03})
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	//
-	// [2 3]
-	// 1
-	// <nil>
-}
-
-func ExampleUInt16() {
-	i, o, err := byteparse.UInt16(binary.BigEndian).Parse([]byte{0x01, 0x02, 0x03})
-	fmt.Println(i)
-	fmt.Printf("0x%x\n", o)
-	fmt.Println(err)
-	// Output:
-	//
-	// [3]
-	// 0x102
-	// <nil>
+func TestUInt16(t *testing.T) {
+	elfMagicNumber := [4]byte{0x7f, 0x45, 0x4c, 0x46}
+	p := byteparse.UInt16(binary.BigEndian)
+	i, o, err := p.Parse(elfMagicNumber[:])
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{0x4c, 0x46}, i)
+	assert.Equal(t, uint16(0x7f45), o)
 }

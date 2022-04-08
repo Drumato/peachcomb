@@ -24,30 +24,25 @@ package byteparse
 
 import (
 	"encoding/binary"
-	"unsafe"
+
+	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
-var (
-	envEndian binary.ByteOrder
-)
-
-func init() {
-	determineEnvEndian()
+func UInt16(byteorder binary.ByteOrder) parser.Parser[[]byte, uint16] {
+	return &uint16Parser{byteorder: byteorder}
 }
 
-func determineEnvEndian() {
-	buf := [4]byte{}
-	const value = uint32(0x01234567)
-	bufPtr := unsafe.Pointer(&buf[0])
-	// assignment
-	*(*uint32)(bufPtr) = value
+type uint16Parser struct {
+	byteorder binary.ByteOrder
+}
 
-	switch buf {
-	case [4]byte{0x67, 0x45, 0x23, 0x01}:
-		envEndian = binary.LittleEndian
-	case [4]byte{0x01, 0x23, 0x45, 0x67}:
-		envEndian = binary.BigEndian
-	default:
-		panic("Could not determine native endianness.")
+var _ parser.Parser[[]byte, uint16] = &uint16Parser{}
+
+func (p *uint16Parser) Parse(input []byte) ([]byte, uint16, parser.ParseError) {
+	if len(input) == 0 {
+		return nil, 0, &parser.NoLeftInputToParseError{}
 	}
+
+	v := p.byteorder.Uint16(input)
+	return input[2:], v, nil
 }
