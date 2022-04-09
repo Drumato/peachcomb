@@ -20,60 +20,70 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse
+package combinator
 
 import (
-	"strings"
+	"fmt"
 
 	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
 // takeWhileParser is the actual implementation of Parser interface
-type takeWhileParser struct {
-	sub parser.Parser[rune, rune]
+type takeWhileParser[E comparable, O parser.ParseOutput] struct {
+	sub parser.Parser[E, O]
 	min uint
 }
 
 // TakeWhile0 initializes a parser that applies the given sub-parser several times.
-func TakeWhile0(sub parser.Parser[rune, rune]) parser.Parser[rune, string] {
-	return &takeWhileParser{sub: sub, min: 0}
+func TakeWhile0[E comparable, O parser.ParseOutput](sub parser.Parser[E, O]) parser.Parser[E, []O] {
+	return &takeWhileParser[E, O]{sub: sub, min: 0}
 }
 
 // TakeWhile1 initializes a parser that applies the given sub-parser several times.
 // if the sub parser fails to parse and the count of application times is 0
 // TakeWhile1 parser return an error.
-func TakeWhile1(sub parser.Parser[rune, rune]) parser.Parser[rune, string] {
-	return &takeWhileParser{sub: sub, min: 1}
+func TakeWhile1[E comparable, O parser.ParseOutput](sub parser.Parser[E, O]) parser.Parser[E, []O] {
+	return &takeWhileParser[E, O]{sub: sub, min: 1}
 }
 
 // Parse implements Parser[string] interface
-func (p *takeWhileParser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
+func (p *takeWhileParser[E, O]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], []O, parser.ParseError) {
 	if len(input) == 0 {
-		return input, "", &parser.NoLeftInputToParseError{}
+		return input, nil, &parser.NoLeftInputToParseError{}
 	}
 
 	count := 0
-	var subI parser.ParseInput[rune]
-	var subO rune
-	var subErr error
-	var output strings.Builder
+	output := make([]O, 0)
+	var rest parser.ParseInput[E]
 	for {
+		var o O
+		var err error
 		if count >= len(input) {
 			break
 		}
 
-		subI, subO, subErr = p.sub.Parse(input[count:])
-		if subErr != nil {
+		rest, o, err = p.sub.Parse(input[count:])
+		if err != nil {
 			break
 		}
 		count++
 
-		output.WriteRune(subO)
+		output = append(output, o)
 	}
 
 	if count < int(p.min) {
-		return subI, output.String(), subErr
+		return rest, output, &NotSatisfiedCountError{}
 	}
 
-	return subI, output.String(), nil
+	return rest, output, nil
+}
+
+// NotSatisfiedCountError notifies the count of sub-parser success are not satisfied.
+type NotSatisfiedCountError struct {
+	expected int
+}
+
+// Error implements error interface.
+func (e *NotSatisfiedCountError) Error() string {
+	return fmt.Sprintf("not satisfied '%d' sub-parser succeeds", e.expected)
 }

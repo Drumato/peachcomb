@@ -42,9 +42,9 @@ func jsonValueParser() parser.Parser[rune, jsonValue] {
 
 func jsonStringValueParser() parser.Parser[rune, jsonValue] {
 	begin := strparse.Rune('"')
-	contents := strparse.TakeWhile0(strparse.Satisfy(func(ch rune) bool { return ch != '"' }))
+	contents := combinator.TakeWhile0(strparse.Satisfy(func(ch rune) bool { return ch != '"' }))
 	end := strparse.Rune('"')
-	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s string) (jsonValue, error) {
+	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s []rune) (jsonValue, error) {
 		return jsonValueString(s), nil
 	})
 

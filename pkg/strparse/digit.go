@@ -22,7 +22,10 @@
 
 package strparse
 
-import "github.com/Drumato/goparsecomb/pkg/parser"
+import (
+	"github.com/Drumato/goparsecomb/pkg/combinator"
+	"github.com/Drumato/goparsecomb/pkg/parser"
+)
 
 func Digit1() parser.Parser[rune, string] {
 	return &digit1Parser{}
@@ -31,12 +34,12 @@ func Digit1() parser.Parser[rune, string] {
 type digit1Parser struct{}
 
 func (p *digit1Parser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
-	i, o, err := TakeWhile1(Satisfy(isDigit)).Parse(input)
+	i, o, err := combinator.TakeWhile1(Satisfy(isDigit)).Parse(input)
 	if err != nil {
 		return input, "", err
 	}
 
-	return i, o, nil
+	return i, string(o), nil
 }
 
 func isDigit(ch rune) bool {

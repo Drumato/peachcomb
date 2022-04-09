@@ -28,32 +28,6 @@ import (
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 )
 
-func ExampleTakeWhile0() {
-	p := strparse.TakeWhile0(strparse.Rune('a'))
-
-	i, o, err := p.Parse([]rune("baaaa"))
-	fmt.Println(string(i))
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// baaaa
-	//
-	// <nil>
-}
-
-func ExampleTakeWhile1() {
-	p := strparse.TakeWhile1(strparse.Rune('a'))
-
-	i, o, err := p.Parse([]rune("aaaabaa"))
-	fmt.Println(string(i))
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// baa
-	// aaaa
-	// <nil>
-}
-
 func ExampleSatisfy() {
 	i, o, err := strparse.Satisfy(func(ch rune) bool {
 		return ch == 'a'

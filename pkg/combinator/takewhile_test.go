@@ -20,11 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse_test
+package combinator_test
 
 import (
 	"testing"
 
+	"github.com/Drumato/goparsecomb/pkg/combinator"
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
@@ -33,11 +34,11 @@ func TestTakewhile1(t *testing.T) {
 	subP := strparse.Satisfy(func(ch rune) bool {
 		return ch == 'a'
 	})
-	p := strparse.TakeWhile1(subP)
+	p := combinator.TakeWhile1(subP)
 
 	i, o, err := p.Parse([]rune("aaaabaa"))
 	assert.NoError(t, err)
-	assert.Equal(t, "aaaa", o)
+	assert.Equal(t, "aaaa", string(o))
 	assert.Equal(t, "baa", string(i))
 }
 
@@ -45,10 +46,10 @@ func TestTakewhile0(t *testing.T) {
 	subP := strparse.Satisfy(func(ch rune) bool {
 		return ch == 'a'
 	})
-	p := strparse.TakeWhile0(subP)
+	p := combinator.TakeWhile0(subP)
 
 	i, o, err := p.Parse([]rune("baa"))
 	assert.NoError(t, err)
-	assert.Equal(t, "", o)
+	assert.Equal(t, "", string(o))
 	assert.Equal(t, "baa", string(i))
 }
