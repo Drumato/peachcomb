@@ -24,7 +24,7 @@ import (
 func main() {
 	subsubP := strparse.Rune('a')
 	subP := strparse.TakeWhile1(subsubP)
-	p := combinator.Map(subP, func(s string) int { return len(s) })
+	p := combinator.Map(subP, func(s string) (int, error) { return len(s), nil })
 	i, o, err := p.Parse("aaaabaaaa")
 	fmt.Println(i)
 	fmt.Printf("%d\n", o)
