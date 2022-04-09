@@ -35,10 +35,10 @@ func TestTakewhile1(t *testing.T) {
 	})
 	p := strparse.TakeWhile1(subP)
 
-	i, o, err := p.Parse("aaaabaa")
+	i, o, err := p.Parse([]rune("aaaabaa"))
 	assert.NoError(t, err)
 	assert.Equal(t, "aaaa", o)
-	assert.Equal(t, "baa", i)
+	assert.Equal(t, "baa", string(i))
 }
 
 func TestTakewhile0(t *testing.T) {
@@ -47,8 +47,8 @@ func TestTakewhile0(t *testing.T) {
 	})
 	p := strparse.TakeWhile0(subP)
 
-	i, o, err := p.Parse("baa")
+	i, o, err := p.Parse([]rune("baa"))
 	assert.NoError(t, err)
 	assert.Equal(t, "", o)
-	assert.Equal(t, "baa", i)
+	assert.Equal(t, "baa", string(i))
 }

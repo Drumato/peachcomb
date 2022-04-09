@@ -30,7 +30,7 @@ import (
 
 // Uint16 initializes a parser that parse 16-bit unsigned integer
 // user can determine the behavior of this parser by giving byteorder what you want to use
-func UInt16(byteorder binary.ByteOrder) parser.Parser[[]byte, uint16] {
+func UInt16(byteorder binary.ByteOrder) parser.Parser[byte, uint16] {
 	return &uint16Parser{byteorder: byteorder}
 }
 
@@ -39,10 +39,10 @@ type uint16Parser struct {
 	byteorder binary.ByteOrder
 }
 
-var _ parser.Parser[[]byte, uint16] = &uint16Parser{}
+var _ parser.Parser[byte, uint16] = &uint16Parser{}
 
-// Parse implements Parser[[]byte, uint16] interface
-func (p *uint16Parser) Parse(input []byte) ([]byte, uint16, parser.ParseError) {
+// Parse implements Parser[byte, uint16] interface
+func (p *uint16Parser) Parse(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint16, parser.ParseError) {
 	if len(input) < 2 {
 		return nil, 0, &parser.NoLeftInputToParseError{}
 	}

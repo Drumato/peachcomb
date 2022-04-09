@@ -24,13 +24,13 @@ package strparse
 
 import "github.com/Drumato/goparsecomb/pkg/parser"
 
-func Digit1() parser.Parser[string, string] {
+func Digit1() parser.Parser[rune, string] {
 	return &digit1Parser{}
 }
 
 type digit1Parser struct{}
 
-func (p *digit1Parser) Parse(input string) (string, string, parser.ParseError) {
+func (p *digit1Parser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
 	i, o, err := TakeWhile1(Satisfy(isDigit)).Parse(input)
 	if err != nil {
 		return input, "", err

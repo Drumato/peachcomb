@@ -24,15 +24,13 @@ package parser
 
 // Parser is an abstract parser that parses string.
 // All parsers in package strparse implements this interface.
-type Parser[I ParseInput, O ParseOutput] interface {
+type Parser[E comparable, O ParseOutput] interface {
 	// Parse parses the input and convert the consumed substr to O actually
-	Parse(input I) (I, O, ParseError)
+	Parse(input ParseInput[E]) (ParseInput[E], O, ParseError)
 }
 
 // ParseInput is the input of Parser interface.
-type ParseInput interface {
-	string | []byte
-}
+type ParseInput[E comparable] []E
 
 // ParseOutput is the actual type of the parser's output
 type ParseOutput interface{}

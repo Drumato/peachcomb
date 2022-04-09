@@ -27,17 +27,17 @@ import (
 )
 
 // Uint8 initializes a parser that parse 8-bit unsigned integer
-func UInt8() parser.Parser[[]byte, uint8] {
+func UInt8() parser.Parser[byte, uint8] {
 	return &uint8Parser{}
 }
 
 // uint8Parser is the actual implementation of Uint8()
 type uint8Parser struct{}
 
-var _ parser.Parser[[]byte, uint8] = &uint8Parser{}
+var _ parser.Parser[byte, uint8] = &uint8Parser{}
 
-// Parse implements Parser[[]byte, uint8] interface
-func (p *uint8Parser) Parse(input []byte) ([]byte, uint8, parser.ParseError) {
+// Parse implements Parser[byte, uint8] interface
+func (p *uint8Parser) Parse(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint8, parser.ParseError) {
 	if len(input) == 0 {
 		return nil, 0, &parser.NoLeftInputToParseError{}
 	}

@@ -25,15 +25,16 @@ package strparse_test
 import (
 	"testing"
 
+	"github.com/Drumato/goparsecomb/pkg/parser"
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSatisfy(t *testing.T) {
 	p := strparse.Satisfy(func(ch rune) bool { return ch == 'a' })
-	i, o, err := p.Parse("abc")
+	i, o, err := p.Parse([]rune("abc"))
 
 	assert.NoError(t, err)
-	assert.Equal(t, "bc", i)
+	assert.Equal(t, parser.ParseInput[rune]("bc"), i)
 	assert.Equal(t, 'a', o)
 }

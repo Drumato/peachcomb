@@ -29,15 +29,15 @@ import (
 )
 
 func TestParseJSONValueOnString(t *testing.T) {
-	i, o, err := jsonValueParser().Parse("\"Drumato\"")
+	i, o, err := jsonValueParser().Parse([]rune("\"Drumato\""))
 	assert.NoError(t, err)
 	assert.Equal(t, jsonValueString("Drumato"), o)
-	assert.Equal(t, "", i)
+	assert.Equal(t, "", string(i))
 }
 
 func TestParseJSONValueOnNumber(t *testing.T) {
-	i, o, err := jsonValueParser().Parse("12345")
+	i, o, err := jsonValueParser().Parse([]rune("12345"))
 	assert.NoError(t, err)
 	assert.Equal(t, jsonValueInteger(12345), o)
-	assert.Equal(t, "", i)
+	assert.Equal(t, "", string(i))
 }

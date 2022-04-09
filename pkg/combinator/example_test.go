@@ -33,9 +33,9 @@ func ExampleMap() {
 	subsubP := strparse.Rune('a')
 	subP := strparse.TakeWhile1(subsubP)
 	p := combinator.Map(subP, func(s string) (int, error) { return len(s), nil })
-	i, o, err := p.Parse("aaaabaaaa")
-	fmt.Println(i)
-	fmt.Printf("%d\n", o)
+	i, o, err := p.Parse([]rune("aaaabaaaa"))
+	fmt.Println(string(i))
+	fmt.Println(o)
 	fmt.Println(err)
 	// Output:
 	// baaaa
@@ -48,8 +48,8 @@ func ExampleAlt() {
 	p2 := strparse.Rune('b')
 	p := strparse.TakeWhile1(combinator.Alt(p1, p2))
 
-	i, o, err := p.Parse("abababc")
-	fmt.Println(i)
+	i, o, err := p.Parse([]rune("abababc"))
+	fmt.Println(string(i))
 	fmt.Println(o)
 	fmt.Println(err)
 	// Output:
@@ -64,8 +64,8 @@ func ExampleDelimited() {
 	contents := strparse.Digit1()
 	p := combinator.Delimited(begin, contents, end)
 
-	i, o, err := p.Parse("(12321)")
-	fmt.Println(i)
+	i, o, err := p.Parse([]rune("(12321)"))
+	fmt.Println(string(i))
 	fmt.Println(o)
 	fmt.Println(err)
 	// Output:

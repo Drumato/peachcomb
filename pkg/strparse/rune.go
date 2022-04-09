@@ -30,7 +30,7 @@ import (
 
 // Rune initializes a parser that consumes one rune.
 // expected is the expected rune that you want to consume
-func Rune(expected rune) parser.Parser[string, rune] {
+func Rune(expected rune) parser.Parser[rune, rune] {
 	return &runeParser{
 		expected: expected,
 	}
@@ -42,22 +42,19 @@ type runeParser struct {
 }
 
 // Parse implements Parser[string, rune] interface
-func (p *runeParser) Parse(input string) (string, rune, parser.ParseError) {
+func (p *runeParser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], rune, parser.ParseError) {
 	if len(input) == 0 {
 		return input, 0, &parser.NoLeftInputToParseError{}
 	}
 
-	ch := []rune(input)[0]
+	ch := input[0]
 	matched := ch == p.expected
 
 	if !matched {
 		return input, 0, &UnexpectedRuneError{actual: ch, expected: p.expected}
 	}
 
-	// input[1:] doesn't split multi-byte string properly
-	// so we should cast it into []rune first.
-	rest := []rune(input)[1:]
-	return string(rest), p.expected, nil
+	return input[1:], p.expected, nil
 }
 
 // UnexpectedRuneError notifies the head of the given input is unexpected.

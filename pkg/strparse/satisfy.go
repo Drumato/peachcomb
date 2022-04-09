@@ -29,7 +29,7 @@ import (
 )
 
 // Satisfy initializes a parser that checks the head of the input satisfies the predicate.
-func Satisfy(pred Predicate) parser.Parser[string, rune] {
+func Satisfy(pred Predicate) parser.Parser[rune, rune] {
 	return &satisfyParser{
 		pred: pred,
 	}
@@ -44,21 +44,18 @@ type satisfyParser struct {
 type Predicate func(ch rune) bool
 
 // Parse implements Parser[string, rune, rune] interface
-func (p *satisfyParser) Parse(input string) (string, rune, parser.ParseError) {
+func (p *satisfyParser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], rune, parser.ParseError) {
 	if len(input) == 0 {
 		return input, 0, &parser.NoLeftInputToParseError{}
 	}
 
-	ch := []rune(input)[0]
+	ch := input[0]
 	notSatisfied := !p.pred(ch)
 	if notSatisfied {
 		return input, 0, &NotSatisfiedError{}
 	}
 
-	// input[1:] doesn't split multi-byte string properly
-	// so we should cast it into []rune first.
-	rest := []rune(input)[1:]
-	return string(rest), ch, nil
+	return input[1:], ch, nil
 }
 
 // NotsatisfiedError notifies that the given predicate is not satisfied.

@@ -30,30 +30,30 @@ import (
 
 // takeWhileParser is the actual implementation of Parser interface
 type takeWhileParser struct {
-	sub parser.Parser[string, rune]
+	sub parser.Parser[rune, rune]
 	min uint
 }
 
 // TakeWhile0 initializes a parser that applies the given sub-parser several times.
-func TakeWhile0(sub parser.Parser[string, rune]) parser.Parser[string, string] {
+func TakeWhile0(sub parser.Parser[rune, rune]) parser.Parser[rune, string] {
 	return &takeWhileParser{sub: sub, min: 0}
 }
 
 // TakeWhile1 initializes a parser that applies the given sub-parser several times.
 // if the sub parser fails to parse and the count of application times is 0
 // TakeWhile1 parser return an error.
-func TakeWhile1(sub parser.Parser[string, rune]) parser.Parser[string, string] {
+func TakeWhile1(sub parser.Parser[rune, rune]) parser.Parser[rune, string] {
 	return &takeWhileParser{sub: sub, min: 1}
 }
 
 // Parse implements Parser[string] interface
-func (p *takeWhileParser) Parse(input string) (string, string, parser.ParseError) {
+func (p *takeWhileParser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
 	if len(input) == 0 {
 		return input, "", &parser.NoLeftInputToParseError{}
 	}
 
 	count := 0
-	var subI string
+	var subI parser.ParseInput[rune]
 	var subO rune
 	var subErr error
 	var output strings.Builder

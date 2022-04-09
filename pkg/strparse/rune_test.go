@@ -25,22 +25,23 @@ package strparse_test
 import (
 	"testing"
 
+	"github.com/Drumato/goparsecomb/pkg/parser"
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRuneOnASCII(t *testing.T) {
 	p := strparse.Rune('a')
-	i, o, err := p.Parse("abc")
+	i, o, err := p.Parse([]rune("abc"))
 	assert.NoError(t, err)
-	assert.Equal(t, "bc", i)
+	assert.Equal(t, parser.ParseInput[rune]("bc"), i)
 	assert.Equal(t, 'a', o)
 }
 
 func TestRuneOnMuitiBytes(t *testing.T) {
 	p := strparse.Rune('あ')
-	i, o, err := p.Parse("あいう")
+	i, o, err := p.Parse([]rune("あいう"))
 	assert.NoError(t, err)
-	assert.Equal(t, "いう", i)
+	assert.Equal(t, parser.ParseInput[rune]("いう"), i)
 	assert.Equal(t, 'あ', o)
 }

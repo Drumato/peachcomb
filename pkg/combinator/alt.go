@@ -24,16 +24,16 @@ package combinator
 
 import "github.com/Drumato/goparsecomb/pkg/parser"
 
-func Alt[I parser.ParseInput, O parser.ParseOutput](parsers ...parser.Parser[I, O]) parser.Parser[I, O] {
-	return &altParser[I, O]{parsers: parsers}
+func Alt[E comparable, O parser.ParseOutput](parsers ...parser.Parser[E, O]) parser.Parser[E, O] {
+	return &altParser[E, O]{parsers: parsers}
 }
 
-type altParser[I parser.ParseInput, O parser.ParseOutput] struct {
-	parsers []parser.Parser[I, O]
+type altParser[E comparable, O parser.ParseOutput] struct {
+	parsers []parser.Parser[E, O]
 }
 
-func (p *altParser[I, O]) Parse(input I) (I, O, parser.ParseError) {
-	var subI I
+func (p *altParser[E, O]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], O, parser.ParseError) {
+	var subI parser.ParseInput[E]
 	var subO O
 	var err parser.ParseError
 

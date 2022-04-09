@@ -30,7 +30,7 @@ import (
 const s = `"hoge"`
 
 func main() {
-	_, v, err := jsonValueParser().Parse(s)
+	_, v, err := jsonValueParser().Parse([]rune(s))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
 		os.Exit(1)
