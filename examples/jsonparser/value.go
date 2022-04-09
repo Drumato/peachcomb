@@ -44,30 +44,16 @@ func jsonStringValueParser() parser.Parser[string, jsonValue] {
 	begin := strparse.Rune('"')
 	contents := strparse.TakeWhile0(strparse.Satisfy(func(ch rune) bool { return ch != '"' }))
 	end := strparse.Rune('"')
-	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s string) jsonValue {
-		return jsonValueString(s)
+	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s string) (jsonValue, error) {
+		return jsonValueString(s), nil
 	})
 
 	return p
 }
 
 func jsonNumberValueParser() parser.Parser[string, jsonValue] {
-	return combinator.Map(strparse.Digit1(), func(s string) jsonValue {
-		v, _ := strconv.ParseInt(s, 10, 64)
-		return jsonValueInteger(v)
+	return combinator.Map(strparse.Digit1(), func(s string) (jsonValue, error) {
+		v, err := strconv.ParseInt(s, 10, 64)
+		return jsonValueInteger(v), err
 	})
-}
-
-func parseJSONNumberValue(input string) (string, jsonValueInteger, parser.ParseError) {
-	p := strparse.Digit1()
-	i, o, err := p.Parse(input)
-	if err != nil {
-		return i, jsonValueInteger(0), err
-	}
-
-	v, err := strconv.ParseInt(o, 10, 64)
-	if err != nil {
-		return i, jsonValueInteger(0), err
-	}
-	return i, jsonValueInteger(v), nil
 }

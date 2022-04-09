@@ -28,18 +28,21 @@ import (
 
 type mapParser[I parser.ParseInput, SO parser.ParseOutput, O parser.ParseOutput] struct {
 	sub parser.Parser[I, SO]
-	fn  func(SO) O
+	fn  func(SO) (O, error)
 }
 
-func Map[I parser.ParseInput, SO parser.ParseOutput, O parser.ParseOutput](sub parser.Parser[I, SO], fn func(SO) O) parser.Parser[I, O] {
+func Map[I parser.ParseInput, SO parser.ParseOutput, O parser.ParseOutput](sub parser.Parser[I, SO], fn func(SO) (O, error)) parser.Parser[I, O] {
 	return &mapParser[I, SO, O]{sub: sub, fn: fn}
 }
 
 func (p *mapParser[I, SO, O]) Parse(input I) (I, O, parser.ParseError) {
-	i, o, err := p.sub.Parse(input)
+	var o O
+
+	i, so, err := p.sub.Parse(input)
 	if err != nil {
-		return i, p.fn(o), err
+		return i, o, err
 	}
 
-	return i, p.fn(o), err
+	o, err = p.fn(so)
+	return i, o, err
 }

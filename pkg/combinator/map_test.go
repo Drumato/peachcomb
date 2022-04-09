@@ -32,7 +32,7 @@ import (
 
 func TestMap(t *testing.T) {
 	subP := strparse.Rune('a')
-	p := combinator.Map(subP, func(ch rune) bool { return ch == 'a' })
+	p := combinator.Map(subP, func(ch rune) (bool, error) { return ch == 'a', nil })
 
 	i, o, err := p.Parse("abc")
 	assert.NoError(t, err)
