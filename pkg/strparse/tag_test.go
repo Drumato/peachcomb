@@ -25,14 +25,15 @@ package strparse_test
 import (
 	"testing"
 
+	"github.com/Drumato/goparsecomb/pkg/parser"
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTag(t *testing.T) {
 	p := strparse.Tag("Go")
-	i, o, err := p.Parse("Golang")
+	i, o, err := p.Parse([]rune("Golang"))
 	assert.NoError(t, err)
-	assert.Equal(t, "lang", i)
+	assert.Equal(t, parser.ParseInput[rune]("lang"), i)
 	assert.Equal(t, "Go", o)
 }

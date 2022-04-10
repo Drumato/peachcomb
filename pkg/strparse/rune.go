@@ -25,39 +25,28 @@ package strparse
 import (
 	"fmt"
 
+	"github.com/Drumato/goparsecomb/pkg/combinator"
 	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
 // Rune initializes a parser that consumes one rune.
-// expected is the expected rune that you want to consume
-func Rune(expected rune) parser.Parser[string, rune] {
+// It's just a specialized parser from combinator.Satisfy().
+func Rune(expected rune) parser.Parser[rune, rune] {
 	return &runeParser{
 		expected: expected,
 	}
 }
 
-// runeParser is the actual impelementation of Parser interface
+// runeParser is the actual impelementation of Parser interface.
 type runeParser struct {
 	expected rune
 }
 
-// Parse implements Parser[string, rune] interface
-func (p *runeParser) Parse(input string) (string, rune, parser.ParseError) {
-	if len(input) == 0 {
-		return input, 0, &parser.NoLeftInputToParseError{}
-	}
-
-	ch := []rune(input)[0]
-	matched := ch == p.expected
-
-	if !matched {
-		return input, 0, &UnexpectedRuneError{actual: ch, expected: p.expected}
-	}
-
-	// input[1:] doesn't split multi-byte string properly
-	// so we should cast it into []rune first.
-	rest := []rune(input)[1:]
-	return string(rest), p.expected, nil
+// Parse implements Parser[string, rune] interface.
+func (p *runeParser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], rune, parser.ParseError) {
+	return combinator.Satisfy(func(ch rune) bool {
+		return ch == p.expected
+	}).Parse(input)
 }
 
 // UnexpectedRuneError notifies the head of the given input is unexpected.

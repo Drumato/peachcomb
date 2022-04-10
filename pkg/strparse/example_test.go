@@ -28,49 +28,9 @@ import (
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 )
 
-func ExampleTakeWhile0() {
-	p := strparse.TakeWhile0(strparse.Rune('a'))
-
-	i, o, err := p.Parse("baaaa")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// baaaa
-	//
-	// <nil>
-}
-
-func ExampleTakeWhile1() {
-	p := strparse.TakeWhile1(strparse.Rune('a'))
-
-	i, o, err := p.Parse("aaaabaa")
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	// baa
-	// aaaa
-	// <nil>
-}
-
-func ExampleSatisfy() {
-	i, o, err := strparse.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	}).Parse("abc")
-	fmt.Println(i)
-	fmt.Printf("%c\n", o)
-	fmt.Println(err)
-	// Output:
-	//
-	// bc
-	// a
-	// <nil>
-}
-
 func ExampleRune() {
-	i, o, err := strparse.Rune('a').Parse("abc")
-	fmt.Println(i)
+	i, o, err := strparse.Rune('a').Parse([]rune("abc"))
+	fmt.Println(string(i))
 	fmt.Printf("%c\n", o)
 	fmt.Println(err)
 	// Output:
@@ -81,8 +41,8 @@ func ExampleRune() {
 }
 
 func ExampleTag() {
-	i, o, err := strparse.Tag("Drum").Parse("Drumato")
-	fmt.Println(i)
+	i, o, err := strparse.Tag("Drum").Parse([]rune("Drumato"))
+	fmt.Println(string(i))
 	fmt.Println(o)
 	fmt.Println(err)
 	// Output:
@@ -93,8 +53,8 @@ func ExampleTag() {
 }
 
 func ExampleDigit1() {
-	i, o, err := strparse.Digit1().Parse("112233abc")
-	fmt.Println(i)
+	i, o, err := strparse.Digit1().Parse([]rune("112233abc"))
+	fmt.Println(string(i))
 	fmt.Println(o)
 	fmt.Println(err)
 	// Output:

@@ -24,31 +24,34 @@ package combinator
 
 import "github.com/Drumato/goparsecomb/pkg/parser"
 
+// Delimited initializes a parser that parses a delimited sequence. (e.g. '[foobar]')
 func Delimited[
-	I parser.ParseInput,
+	E comparable,
 	O1 parser.ParseOutput,
 	O2 parser.ParseOutput,
 	O3 parser.ParseOutput,
 ](
-	begin parser.Parser[I, O1],
-	contents parser.Parser[I, O2],
-	end parser.Parser[I, O3],
-) parser.Parser[I, O2] {
-	return &delimitedParser[I, O1, O2, O3]{begin: begin, contents: contents, end: end}
+	begin parser.Parser[E, O1],
+	contents parser.Parser[E, O2],
+	end parser.Parser[E, O3],
+) parser.Parser[E, O2] {
+	return &delimitedParser[E, O1, O2, O3]{begin: begin, contents: contents, end: end}
 }
 
+// delimitedParser is the actual implementation of Delimited parser.
 type delimitedParser[
-	I parser.ParseInput,
+	E comparable,
 	O1 parser.ParseOutput,
 	O2 parser.ParseOutput,
 	O3 parser.ParseOutput,
 ] struct {
-	begin    parser.Parser[I, O1]
-	contents parser.Parser[I, O2]
-	end      parser.Parser[I, O3]
+	begin    parser.Parser[E, O1]
+	contents parser.Parser[E, O2]
+	end      parser.Parser[E, O3]
 }
 
-func (p *delimitedParser[I, O1, O2, O3]) Parse(input I) (I, O2, parser.ParseError) {
+// Parse implements parser.Parser[E comparable, O2 parser.ParseOutput] interface.
+func (p *delimitedParser[E, O1, O2, O3]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], O2, parser.ParseError) {
 	var o2 O2
 	rest, _, err := p.begin.Parse(input)
 	if err != nil {

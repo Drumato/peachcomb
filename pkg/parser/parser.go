@@ -24,20 +24,21 @@ package parser
 
 // Parser is an abstract parser that parses string.
 // All parsers in package strparse implements this interface.
-type Parser[I ParseInput, O ParseOutput] interface {
-	// Parse parses the input and convert the consumed substr to O actually
-	Parse(input I) (I, O, ParseError)
+// input must be a slice of certain type that implements comparable builtin interface.
+type Parser[E comparable, O ParseOutput] interface {
+	// Parse parses the input and convert the consumed stuff to O actually.
+	Parse(input ParseInput[E]) (ParseInput[E], O, ParseError)
 }
 
 // ParseInput is the input of Parser interface.
-type ParseInput interface {
-	string | []byte
-}
+// It's just a slice of [E comparable].
+type ParseInput[E comparable] []E
 
-// ParseOutput is the actual type of the parser's output
+// ParseOutput is the actual type of the parser's output.
+// Note that this interface may be constrainted more in future.
 type ParseOutput interface{}
 
-// ParseError represents the error of parsers in package strparse
+// ParseError represents the error of parsers in all parsers.
 type ParseError interface {
 	error
 }
@@ -48,10 +49,10 @@ func ErrorIs[T ParseError](err error, ty T) bool {
 	return ok
 }
 
-// NoLeftInputToParseError notifies the given input to parser is empty
+// NoLeftInputToParseError notifies the given input to parser is empty.
 type NoLeftInputToParseError struct{}
 
-// Error implements error interface
+// Error implements error interface.
 func (e *NoLeftInputToParseError) Error() string {
 	return "no left input to parse"
 }

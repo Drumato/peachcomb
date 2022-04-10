@@ -36,22 +36,22 @@ type jsonValue interface {
 type jsonValueString string
 type jsonValueInteger int
 
-func jsonValueParser() parser.Parser[string, jsonValue] {
+func jsonValueParser() parser.Parser[rune, jsonValue] {
 	return combinator.Alt(jsonStringValueParser(), jsonNumberValueParser())
 }
 
-func jsonStringValueParser() parser.Parser[string, jsonValue] {
+func jsonStringValueParser() parser.Parser[rune, jsonValue] {
 	begin := strparse.Rune('"')
-	contents := strparse.TakeWhile0(strparse.Satisfy(func(ch rune) bool { return ch != '"' }))
+	contents := combinator.TakeWhile0(combinator.Satisfy(func(ch rune) bool { return ch != '"' }))
 	end := strparse.Rune('"')
-	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s string) (jsonValue, error) {
+	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s []rune) (jsonValue, error) {
 		return jsonValueString(s), nil
 	})
 
 	return p
 }
 
-func jsonNumberValueParser() parser.Parser[string, jsonValue] {
+func jsonNumberValueParser() parser.Parser[rune, jsonValue] {
 	return combinator.Map(strparse.Digit1(), func(s string) (jsonValue, error) {
 		v, err := strconv.ParseInt(s, 10, 64)
 		return jsonValueInteger(v), err

@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package strparse
+package combinator
 
 import (
 	"fmt"
@@ -29,47 +29,44 @@ import (
 )
 
 // Satisfy initializes a parser that checks the head of the input satisfies the predicate.
-func Satisfy(pred Predicate) parser.Parser[string, rune] {
-	return &satisfyParser{
+func Satisfy[E comparable](pred Predicate[E]) parser.Parser[E, E] {
+	return &satisfyParser[E]{
 		pred: pred,
 	}
 }
 
 // satisfyParser is the actual implementation of Parser interface
-type satisfyParser struct {
-	pred Predicate
+type satisfyParser[E comparable] struct {
+	pred Predicate[E]
 }
 
-// Predicate is the condition that satisfyParser uses for consuming one rune.
-type Predicate func(ch rune) bool
+// Predicate is the condition that satisfyParser uses for consuming one element.
+type Predicate[E comparable] func(element E) bool
 
-// Parse implements Parser[string, rune, rune] interface
-func (p *satisfyParser) Parse(input string) (string, rune, parser.ParseError) {
+// Parse implements parser.Parser[E comparable, E parser.ParseOutput] interface
+// NOTE: we should think about considering E as parser.ParseOutput. Are there any concerns about it?
+func (p *satisfyParser[E]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], E, parser.ParseError) {
+	var e E
 	if len(input) == 0 {
-		return input, 0, &parser.NoLeftInputToParseError{}
+		return input, e, &parser.NoLeftInputToParseError{}
 	}
 
-	ch := []rune(input)[0]
-	notSatisfied := !p.pred(ch)
+	e = input[0]
+	notSatisfied := !p.pred(e)
 	if notSatisfied {
-		return input, 0, &NotSatisfiedError{}
+		return input, e, &NotSatisfiedError[E]{actual: e}
 	}
 
-	// input[1:] doesn't split multi-byte string properly
-	// so we should cast it into []rune first.
-	rest := []rune(input)[1:]
-	return string(rest), ch, nil
+	return input[1:], e, nil
 }
 
 // NotsatisfiedError notifies that the given predicate is not satisfied.
-type NotSatisfiedError struct {
+type NotSatisfiedError[E comparable] struct {
 	// actual is the given rune that satisfyParser consumed
-	actual rune
+	actual E
 }
 
-var _ parser.ParseError = &NotSatisfiedError{}
-
 // Error implements error interface
-func (e *NotSatisfiedError) Error() string {
-	return fmt.Sprintf("predicate was not satisfied on '%c'", e.actual)
+func (e *NotSatisfiedError[E]) Error() string {
+	return fmt.Sprintf("predicate was not satisfied on '%+v'", e.actual)
 }

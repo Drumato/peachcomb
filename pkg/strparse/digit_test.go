@@ -31,8 +31,8 @@ import (
 
 func TestDigit1(t *testing.T) {
 	p := strparse.Digit1()
-	i, o, err := p.Parse("11223344b")
+	i, o, err := p.Parse([]rune("11223344b"))
 	assert.NoError(t, err)
-	assert.Equal(t, "b", i)
+	assert.Equal(t, "b", string(i))
 	assert.Equal(t, "11223344", o)
 }

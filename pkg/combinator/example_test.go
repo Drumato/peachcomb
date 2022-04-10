@@ -29,13 +29,27 @@ import (
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 )
 
+func ExampleSatisfy() {
+	i, o, err := combinator.Satisfy(func(ch rune) bool {
+		return ch == 'a'
+	}).Parse([]rune("abc"))
+	fmt.Println(string(i))
+	fmt.Printf("%c\n", o)
+	fmt.Println(err)
+	// Output:
+	//
+	// bc
+	// a
+	// <nil>
+}
+
 func ExampleMap() {
 	subsubP := strparse.Rune('a')
-	subP := strparse.TakeWhile1(subsubP)
-	p := combinator.Map(subP, func(s string) (int, error) { return len(s), nil })
-	i, o, err := p.Parse("aaaabaaaa")
-	fmt.Println(i)
-	fmt.Printf("%d\n", o)
+	subP := combinator.TakeWhile1(subsubP)
+	p := combinator.Map(subP, func(s []rune) (int, error) { return len(s), nil })
+	i, o, err := p.Parse([]rune("aaaabaaaa"))
+	fmt.Println(string(i))
+	fmt.Println(o)
 	fmt.Println(err)
 	// Output:
 	// baaaa
@@ -46,11 +60,11 @@ func ExampleMap() {
 func ExampleAlt() {
 	p1 := strparse.Rune('a')
 	p2 := strparse.Rune('b')
-	p := strparse.TakeWhile1(combinator.Alt(p1, p2))
+	p := combinator.TakeWhile1(combinator.Alt(p1, p2))
 
-	i, o, err := p.Parse("abababc")
-	fmt.Println(i)
-	fmt.Println(o)
+	i, o, err := p.Parse([]rune("abababc"))
+	fmt.Println(string(i))
+	fmt.Println(string(o))
 	fmt.Println(err)
 	// Output:
 	// c
@@ -64,12 +78,38 @@ func ExampleDelimited() {
 	contents := strparse.Digit1()
 	p := combinator.Delimited(begin, contents, end)
 
-	i, o, err := p.Parse("(12321)")
-	fmt.Println(i)
+	i, o, err := p.Parse([]rune("(12321)"))
+	fmt.Println(string(i))
 	fmt.Println(o)
 	fmt.Println(err)
 	// Output:
 	//
 	// 12321
+	// <nil>
+}
+
+func ExampleTakeWhile0() {
+	p := combinator.TakeWhile0(strparse.Rune('a'))
+
+	i, o, err := p.Parse([]rune("baaaa"))
+	fmt.Println(string(i))
+	fmt.Println(string(o))
+	fmt.Println(err)
+	// Output:
+	// baaaa
+	//
+	// <nil>
+}
+
+func ExampleTakeWhile1() {
+	p := combinator.TakeWhile1(strparse.Rune('a'))
+
+	i, o, err := p.Parse([]rune("aaaabaa"))
+	fmt.Println(string(i))
+	fmt.Println(string(o))
+	fmt.Println(err)
+	// Output:
+	// baa
+	// aaaa
 	// <nil>
 }

@@ -35,13 +35,13 @@ func TestAlt(t *testing.T) {
 	p2 := strparse.Rune('b')
 	p := combinator.Alt(p1, p2)
 
-	i, o, err := p.Parse("a")
+	i, o, err := p.Parse([]rune("a"))
 	assert.NoError(t, err)
-	assert.Equal(t, "", i)
+	assert.Equal(t, "", string(i))
 	assert.Equal(t, 'a', o)
 
-	i, o, err = p.Parse("b")
+	i, o, err = p.Parse([]rune("b"))
 	assert.NoError(t, err)
-	assert.Equal(t, "", i)
+	assert.Equal(t, "", string(i))
 	assert.Equal(t, 'b', o)
 }

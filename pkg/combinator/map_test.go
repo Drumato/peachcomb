@@ -34,8 +34,8 @@ func TestMap(t *testing.T) {
 	subP := strparse.Rune('a')
 	p := combinator.Map(subP, func(ch rune) (bool, error) { return ch == 'a', nil })
 
-	i, o, err := p.Parse("abc")
+	i, o, err := p.Parse([]rune("abc"))
 	assert.NoError(t, err)
-	assert.Equal(t, "bc", i)
+	assert.Equal(t, "bc", string(i))
 	assert.Equal(t, true, o)
 }

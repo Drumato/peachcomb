@@ -36,8 +36,8 @@ func TestDelimited(t *testing.T) {
 	end := strparse.Rune('"')
 
 	p := combinator.Delimited(begin, contents, end)
-	i, o, err := p.Parse("\"12345\"")
+	i, o, err := p.Parse([]rune("\"12345\""))
 	assert.NoError(t, err)
-	assert.Equal(t, "", i)
+	assert.Equal(t, "", string(i))
 	assert.Equal(t, "12345", o)
 }

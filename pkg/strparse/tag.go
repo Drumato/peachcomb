@@ -24,35 +24,35 @@ package strparse
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
 // Tag initializes a parser that checks the input starts with the tag prefix.
-func Tag(tag string) parser.Parser[string, string] {
+func Tag(tag string) parser.Parser[rune, string] {
 	return &tagParser{
 		tag: tag,
 	}
 }
 
-// tagParser is the actual implementation of Parser interface
+// tagParser is the actual implementation of Parser interface.
 type tagParser struct {
 	tag string
 }
 
-// Parse implements Parser[string, string] interface
-func (p *tagParser) Parse(input string) (string, string, parser.ParseError) {
-	if len(input) < len(p.tag) {
+// Parse implements Parser[rune, string] interface.
+func (p *tagParser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
+	tag := []rune(p.tag)
+	if len(input) < len(tag) {
 		return input, "", &parser.NoLeftInputToParseError{}
 	}
 
-	unmatched := !strings.HasPrefix(input, p.tag)
+	unmatched := !hasPrefix(input, tag)
 	if unmatched {
 		return input, "", &UnexpectedPrefixError{expected: p.tag}
 	}
 
-	return strings.TrimPrefix(input, p.tag), p.tag, nil
+	return input[len(tag):], p.tag, nil
 }
 
 // UnexpectedPrefixError notifies the prefix of the given input is unexpected.
