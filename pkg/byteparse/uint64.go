@@ -20,21 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package byteparse_test
+package byteparse
 
 import (
 	"encoding/binary"
-	"testing"
 
-	"github.com/Drumato/peachcomb/pkg/byteparse"
-	"github.com/stretchr/testify/assert"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-func TestUInt16(t *testing.T) {
-	elfMagicNumber := []byte{0x7f, 0x45, 0x4c, 0x46}
-	p := byteparse.UInt16(binary.BigEndian)
-	i, o, err := p.Parse(elfMagicNumber)
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(i))
-	assert.Equal(t, uint16(0x7f45), o)
+// Uint64 initializes a parser that parse 64-bit unsigned integer.
+// user can determine the behavior of this parser by giving byteorder what you want to use.
+func UInt64(byteorder binary.ByteOrder) parser.Parser[byte, uint64] {
+	return &uint64Parser{byteorder: byteorder}
+}
+
+// uint64Parser is the actual implementation of Uint64().
+type uint64Parser struct {
+	byteorder binary.ByteOrder
+}
+
+var _ parser.Parser[byte, uint64] = &uint64Parser{}
+
+// Parse implements parser.Parser[byte, uint64] interface.
+func (p *uint64Parser) Parse(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint64, parser.ParseError) {
+	if len(input) < 8 {
+		return nil, 0, &parser.NoLeftInputToParseError{}
+	}
+
+	v := p.byteorder.Uint64(input)
+	return input[8:], v, nil
 }

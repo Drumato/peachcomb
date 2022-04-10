@@ -30,11 +30,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUInt16(t *testing.T) {
-	elfMagicNumber := []byte{0x7f, 0x45, 0x4c, 0x46}
-	p := byteparse.UInt16(binary.BigEndian)
-	i, o, err := p.Parse(elfMagicNumber)
+func TestUInt64(t *testing.T) {
+	i := []byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
+	p := byteparse.UInt64(binary.BigEndian)
+	i, o, err := p.Parse(i)
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(i))
-	assert.Equal(t, uint16(0x7f45), o)
+	assert.Equal(t, 0, len(i))
+	assert.Equal(t, uint64(0x102030405060708), o)
 }

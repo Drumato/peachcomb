@@ -26,15 +26,14 @@ import (
 	"testing"
 
 	"github.com/Drumato/peachcomb/pkg/byteparse"
-	"github.com/Drumato/peachcomb/pkg/parser"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUInt8(t *testing.T) {
-	elfMagicNumber := parser.ParseInput[byte]{0x7f, 0x45, 0x4c, 0x46}
+	elfMagicNumber := []byte{0x7f, 0x45, 0x4c, 0x46}
 	p := byteparse.UInt8()
 	i, o, err := p.Parse(elfMagicNumber)
 	assert.NoError(t, err)
-	assert.Equal(t, parser.ParseInput[byte]{0x45, 0x4c, 0x46}, i)
+	assert.Equal(t, 3, len(i))
 	assert.Equal(t, uint8(0x7f), o)
 }

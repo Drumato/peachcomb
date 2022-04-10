@@ -52,3 +52,15 @@ func ExampleUInt16() {
 	// 0x102
 	// <nil>
 }
+
+func ExampleUInt32() {
+	i, o, err := byteparse.UInt32(binary.BigEndian).Parse([]byte{0x01, 0x02, 0x03, 0x04})
+	fmt.Println(i)
+	fmt.Printf("0x%x\n", o)
+	fmt.Println(err)
+	// Output:
+	//
+	// []
+	// 0x1020304
+	// <nil>
+}

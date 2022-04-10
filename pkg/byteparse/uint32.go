@@ -20,21 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package byteparse_test
+package byteparse
 
 import (
 	"encoding/binary"
-	"testing"
 
-	"github.com/Drumato/peachcomb/pkg/byteparse"
-	"github.com/stretchr/testify/assert"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-func TestUInt16(t *testing.T) {
-	elfMagicNumber := []byte{0x7f, 0x45, 0x4c, 0x46}
-	p := byteparse.UInt16(binary.BigEndian)
-	i, o, err := p.Parse(elfMagicNumber)
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(i))
-	assert.Equal(t, uint16(0x7f45), o)
+// Uint32 initializes a parser that parse 32-bit unsigned integer.
+// user can determine the behavior of this parser by giving byteorder what you want to use.
+func UInt32(byteorder binary.ByteOrder) parser.Parser[byte, uint32] {
+	return &uint32Parser{byteorder: byteorder}
+}
+
+// uint32Parser is the actual implementation of Uint32().
+type uint32Parser struct {
+	byteorder binary.ByteOrder
+}
+
+var _ parser.Parser[byte, uint32] = &uint32Parser{}
+
+// Parse implements parser.Parser[byte, uint32] interface.
+func (p *uint32Parser) Parse(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint32, parser.ParseError) {
+	if len(input) < 4 {
+		return nil, 0, &parser.NoLeftInputToParseError{}
+	}
+
+	v := p.byteorder.Uint32(input)
+	return input[4:], v, nil
 }
