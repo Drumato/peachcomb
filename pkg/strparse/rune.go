@@ -25,6 +25,7 @@ package strparse
 import (
 	"fmt"
 
+	"github.com/Drumato/goparsecomb/pkg/combinator"
 	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
@@ -43,18 +44,9 @@ type runeParser struct {
 
 // Parse implements Parser[string, rune] interface
 func (p *runeParser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], rune, parser.ParseError) {
-	if len(input) == 0 {
-		return input, 0, &parser.NoLeftInputToParseError{}
-	}
-
-	ch := input[0]
-	matched := ch == p.expected
-
-	if !matched {
-		return input, 0, &UnexpectedRuneError{actual: ch, expected: p.expected}
-	}
-
-	return input[1:], p.expected, nil
+	return combinator.Satisfy(func(ch rune) bool {
+		return ch == p.expected
+	}).Parse(input)
 }
 
 // UnexpectedRuneError notifies the head of the given input is unexpected.
