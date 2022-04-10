@@ -22,7 +22,7 @@
 
 package combinator
 
-import "github.com/Drumato/goparsecomb/pkg/parser"
+import "github.com/Drumato/peachcomb/pkg/parser"
 
 func Separated1[E comparable, EO parser.ParseOutput, SO parser.ParseOutput](element parser.Parser[E, EO], separator parser.Parser[E, SO]) parser.Parser[E, []EO] {
 	return &separatedParser[E, EO, SO]{element, separator}

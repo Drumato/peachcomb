@@ -1,6 +1,6 @@
-# goparsecomb
+# peachcomb
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/Drumato/goparsecomb.svg)](https://pkg.go.dev/github.com/Drumato/goparsecomb)  
+[![Go Reference](https://pkg.go.dev/badge/github.com/Drumato/peachcomb.svg)](https://pkg.go.dev/github.com/Drumato/peachcomb)  
 
 Go Parser Combinator with Go Generics.  
 
@@ -17,8 +17,8 @@ currently this library is so simple. you only should follow 2 steps as below.
 package main
 
 import (
-    "github.com/Drumato/goparsecomb/pkg/strparse"
-    "github.com/Drumato/goparsecomb/pkg/combinator"
+    "github.com/Drumato/peachcomb/pkg/strparse"
+    "github.com/Drumato/peachcomb/pkg/combinator"
 )
 
 func main() {

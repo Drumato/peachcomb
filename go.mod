@@ -1,4 +1,4 @@
-module github.com/Drumato/goparsecomb
+module github.com/Drumato/peachcomb
 
 go 1.18
 

@@ -25,7 +25,7 @@ package byteparse
 import (
 	"encoding/binary"
 
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
 // Uint16 initializes a parser that parse 16-bit unsigned integer.

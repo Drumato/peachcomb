@@ -23,7 +23,7 @@
 package combinator
 
 import (
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
 // Map initializes a parser that applies a sub-parser and give the it's output to fn.

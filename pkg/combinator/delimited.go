@@ -22,7 +22,7 @@
 
 package combinator
 
-import "github.com/Drumato/goparsecomb/pkg/parser"
+import "github.com/Drumato/peachcomb/pkg/parser"
 
 // Delimited initializes a parser that parses a delimited sequence. (e.g. '[foobar]')
 func Delimited[

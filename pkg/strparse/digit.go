@@ -23,8 +23,8 @@
 package strparse
 
 import (
-	"github.com/Drumato/goparsecomb/pkg/combinator"
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
 // Digit1 initializes a parser that follows (0-9)+ syntax rule.

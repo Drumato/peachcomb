@@ -22,7 +22,7 @@
 
 package combinator
 
-import "github.com/Drumato/goparsecomb/pkg/parser"
+import "github.com/Drumato/peachcomb/pkg/parser"
 
 // Alt initializes a parser that applies all given parsers.
 // if them of all given are failed to parse, Alt() parser also returns a error.

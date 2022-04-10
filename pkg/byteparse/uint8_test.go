@@ -25,8 +25,8 @@ package byteparse_test
 import (
 	"testing"
 
-	"github.com/Drumato/goparsecomb/pkg/byteparse"
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/byteparse"
+	"github.com/Drumato/peachcomb/pkg/parser"
 	"github.com/stretchr/testify/assert"
 )
 

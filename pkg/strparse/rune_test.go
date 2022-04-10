@@ -25,8 +25,8 @@ package strparse_test
 import (
 	"testing"
 
-	"github.com/Drumato/goparsecomb/pkg/parser"
-	"github.com/Drumato/goparsecomb/pkg/strparse"
+	"github.com/Drumato/peachcomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 

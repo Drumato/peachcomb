@@ -26,7 +26,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"github.com/Drumato/goparsecomb/pkg/byteparse"
+	"github.com/Drumato/peachcomb/pkg/byteparse"
 )
 
 func ExampleUInt8() {

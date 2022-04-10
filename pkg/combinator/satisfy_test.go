@@ -25,7 +25,7 @@ package combinator_test
 import (
 	"testing"
 
-	"github.com/Drumato/goparsecomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/combinator"
 	"github.com/stretchr/testify/assert"
 )
 

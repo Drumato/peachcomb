@@ -25,7 +25,7 @@ package combinator
 import (
 	"fmt"
 
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
 // TakeWhile0 initializes a parser that applies the given sub-parser several times.
