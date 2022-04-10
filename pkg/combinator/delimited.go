@@ -24,6 +24,7 @@ package combinator
 
 import "github.com/Drumato/goparsecomb/pkg/parser"
 
+// Delimited initializes a parser that parses a delimited sequence. (e.g. '[foobar]')
 func Delimited[
 	E comparable,
 	O1 parser.ParseOutput,
@@ -37,6 +38,7 @@ func Delimited[
 	return &delimitedParser[E, O1, O2, O3]{begin: begin, contents: contents, end: end}
 }
 
+// delimitedParser is the actual implementation of Delimited parser.
 type delimitedParser[
 	E comparable,
 	O1 parser.ParseOutput,
@@ -48,6 +50,7 @@ type delimitedParser[
 	end      parser.Parser[E, O3]
 }
 
+// Parse implements parser.Parser[E comparable, O2 parser.ParseOutput] interface.
 func (p *delimitedParser[E, O1, O2, O3]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], O2, parser.ParseError) {
 	var o2 O2
 	rest, _, err := p.begin.Parse(input)

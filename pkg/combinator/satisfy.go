@@ -43,7 +43,8 @@ type satisfyParser[E comparable] struct {
 // Predicate is the condition that satisfyParser uses for consuming one element.
 type Predicate[E comparable] func(element E) bool
 
-// Parse implements Parser[string, rune, rune] interface
+// Parse implements parser.Parser[E comparable, E parser.ParseOutput] interface
+// NOTE: we should think about considering E as parser.ParseOutput. Are there any concerns about it?
 func (p *satisfyParser[E]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], E, parser.ParseError) {
 	var e E
 	if len(input) == 0 {
@@ -53,7 +54,7 @@ func (p *satisfyParser[E]) Parse(input parser.ParseInput[E]) (parser.ParseInput[
 	e = input[0]
 	notSatisfied := !p.pred(e)
 	if notSatisfied {
-		return input, e, &NotSatisfiedError[E]{}
+		return input, e, &NotSatisfiedError[E]{actual: e}
 	}
 
 	return input[1:], e, nil

@@ -24,20 +24,27 @@ package combinator
 
 import "github.com/Drumato/goparsecomb/pkg/parser"
 
+// Alt initializes a parser that applies all given parsers.
+// if them of all given are failed to parse, Alt() parser also returns a error.
+// otherwise Alt() succeeds to parse.
 func Alt[E comparable, O parser.ParseOutput](parsers ...parser.Parser[E, O]) parser.Parser[E, O] {
 	return &altParser[E, O]{parsers: parsers}
 }
 
+// altParser is the actual implementation of Alt() parser.
 type altParser[E comparable, O parser.ParseOutput] struct {
 	parsers []parser.Parser[E, O]
 }
 
+// Parse implements parser.Parser[E comparable, O parser.ParseOutput] interface.
 func (p *altParser[E, O]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], O, parser.ParseError) {
+	// subI holds the rest input in outer scope of for-statement.
 	var subI parser.ParseInput[E]
 	var subO O
-	var err parser.ParseError
 
 	for _, subP := range p.parsers {
+		var err parser.ParseError
+
 		subI, subO, err = subP.Parse(input)
 		if err == nil {
 			return subI, subO, nil

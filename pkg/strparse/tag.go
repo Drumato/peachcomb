@@ -35,12 +35,12 @@ func Tag(tag string) parser.Parser[rune, string] {
 	}
 }
 
-// tagParser is the actual implementation of Parser interface
+// tagParser is the actual implementation of Parser interface.
 type tagParser struct {
 	tag string
 }
 
-// Parse implements Parser[rune, string] interface
+// Parse implements Parser[rune, string] interface.
 func (p *tagParser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
 	tag := []rune(p.tag)
 	if len(input) < len(tag) {

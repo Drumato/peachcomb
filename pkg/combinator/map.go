@@ -26,15 +26,18 @@ import (
 	"github.com/Drumato/goparsecomb/pkg/parser"
 )
 
+// Map initializes a parser that applies a sub-parser and give the it's output to fn.
+func Map[E comparable, SO parser.ParseOutput, O parser.ParseOutput](sub parser.Parser[E, SO], fn func(SO) (O, error)) parser.Parser[E, O] {
+	return &mapParser[E, SO, O]{sub: sub, fn: fn}
+}
+
+// mapParser is the actual implementation of Map() parser.
 type mapParser[E comparable, SO parser.ParseOutput, O parser.ParseOutput] struct {
 	sub parser.Parser[E, SO]
 	fn  func(SO) (O, error)
 }
 
-func Map[E comparable, SO parser.ParseOutput, O parser.ParseOutput](sub parser.Parser[E, SO], fn func(SO) (O, error)) parser.Parser[E, O] {
-	return &mapParser[E, SO, O]{sub: sub, fn: fn}
-}
-
+// Parse implements parser.Parser[E comparable, O parser.ParseOutput] interface.
 func (p *mapParser[E, SO, O]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], O, parser.ParseError) {
 	var o O
 

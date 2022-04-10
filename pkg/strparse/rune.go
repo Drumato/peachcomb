@@ -30,19 +30,19 @@ import (
 )
 
 // Rune initializes a parser that consumes one rune.
-// expected is the expected rune that you want to consume
+// It's just a specialized parser from combinator.Satisfy().
 func Rune(expected rune) parser.Parser[rune, rune] {
 	return &runeParser{
 		expected: expected,
 	}
 }
 
-// runeParser is the actual impelementation of Parser interface
+// runeParser is the actual impelementation of Parser interface.
 type runeParser struct {
 	expected rune
 }
 
-// Parse implements Parser[string, rune] interface
+// Parse implements Parser[string, rune] interface.
 func (p *runeParser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], rune, parser.ParseError) {
 	return combinator.Satisfy(func(ch rune) bool {
 		return ch == p.expected
