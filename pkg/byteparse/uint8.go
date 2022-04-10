@@ -23,7 +23,7 @@
 package byteparse
 
 import (
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
 // Uint8 initializes a parser that parse 8-bit unsigned integer.

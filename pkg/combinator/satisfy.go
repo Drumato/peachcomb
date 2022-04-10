@@ -25,7 +25,7 @@ package combinator
 import (
 	"fmt"
 
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
 // Satisfy initializes a parser that checks the head of the input satisfies the predicate.

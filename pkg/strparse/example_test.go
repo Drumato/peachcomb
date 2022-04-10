@@ -25,7 +25,7 @@ package strparse_test
 import (
 	"fmt"
 
-	"github.com/Drumato/goparsecomb/pkg/strparse"
+	"github.com/Drumato/peachcomb/pkg/strparse"
 )
 
 func ExampleRune() {

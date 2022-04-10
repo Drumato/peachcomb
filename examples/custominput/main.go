@@ -26,8 +26,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Drumato/goparsecomb/pkg/combinator"
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
 type myTokenKind string

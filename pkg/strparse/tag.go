@@ -25,7 +25,7 @@ package strparse
 import (
 	"fmt"
 
-	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
 // Tag initializes a parser that checks the input starts with the tag prefix.

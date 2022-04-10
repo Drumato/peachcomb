@@ -23,9 +23,9 @@
 package main
 
 import (
-	"github.com/Drumato/goparsecomb/pkg/combinator"
-	"github.com/Drumato/goparsecomb/pkg/parser"
-	"github.com/Drumato/goparsecomb/pkg/strparse"
+	"github.com/Drumato/peachcomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/strparse"
 )
 
 type jsonArray struct {
