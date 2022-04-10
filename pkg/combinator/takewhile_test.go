@@ -26,12 +26,11 @@ import (
 	"testing"
 
 	"github.com/Drumato/goparsecomb/pkg/combinator"
-	"github.com/Drumato/goparsecomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTakewhile1(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
+	subP := combinator.Satisfy(func(ch rune) bool {
 		return ch == 'a'
 	})
 	p := combinator.TakeWhile1(subP)
@@ -43,7 +42,7 @@ func TestTakewhile1(t *testing.T) {
 }
 
 func TestTakewhile0(t *testing.T) {
-	subP := strparse.Satisfy(func(ch rune) bool {
+	subP := combinator.Satisfy(func(ch rune) bool {
 		return ch == 'a'
 	})
 	p := combinator.TakeWhile0(subP)

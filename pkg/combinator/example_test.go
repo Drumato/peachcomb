@@ -29,6 +29,20 @@ import (
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 )
 
+func ExampleSatisfy() {
+	i, o, err := combinator.Satisfy(func(ch rune) bool {
+		return ch == 'a'
+	}).Parse([]rune("abc"))
+	fmt.Println(string(i))
+	fmt.Printf("%c\n", o)
+	fmt.Println(err)
+	// Output:
+	//
+	// bc
+	// a
+	// <nil>
+}
+
 func ExampleMap() {
 	subsubP := strparse.Rune('a')
 	subP := combinator.TakeWhile1(subsubP)
