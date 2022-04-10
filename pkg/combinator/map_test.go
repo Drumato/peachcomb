@@ -23,6 +23,7 @@
 package combinator_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/Drumato/peachcomb/pkg/combinator"
@@ -30,12 +31,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMap(t *testing.T) {
+func TestMapSubParserFailure(t *testing.T) {
 	subP := strparse.Rune('a')
 	p := combinator.Map(subP, func(ch rune) (bool, error) { return ch == 'a', nil })
 
-	i, o, err := p.Parse([]rune("abc"))
-	assert.NoError(t, err)
-	assert.Equal(t, "bc", string(i))
-	assert.Equal(t, true, o)
+	_, _, err := p.Parse([]rune("bc"))
+	assert.Error(t, err)
+}
+
+func TestMapFnFailure(t *testing.T) {
+	subP := strparse.Rune('a')
+	p := combinator.Map(subP, func(ch rune) (bool, error) { return false, fmt.Errorf("") })
+
+	_, _, err := p.Parse([]rune("a"))
+	assert.Error(t, err)
 }

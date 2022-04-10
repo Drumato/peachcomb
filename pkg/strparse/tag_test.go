@@ -25,15 +25,18 @@ package strparse_test
 import (
 	"testing"
 
-	"github.com/Drumato/peachcomb/pkg/parser"
 	"github.com/Drumato/peachcomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTag(t *testing.T) {
-	p := strparse.Tag("Go")
-	i, o, err := p.Parse([]rune("Golang"))
-	assert.NoError(t, err)
-	assert.Equal(t, parser.ParseInput[rune]("lang"), i)
-	assert.Equal(t, "Go", o)
+func TestTagFailureWithShorterInput(t *testing.T) {
+	p := strparse.Tag("Golang")
+	_, _, err := p.Parse([]rune("Go"))
+	assert.Error(t, err)
+}
+
+func TestTagFailure(t *testing.T) {
+	p := strparse.Tag("Clang")
+	_, _, err := p.Parse([]rune("Dlang"))
+	assert.Error(t, err)
 }

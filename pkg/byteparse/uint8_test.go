@@ -29,11 +29,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUInt8(t *testing.T) {
-	elfMagicNumber := []byte{0x7f, 0x45, 0x4c, 0x46}
+func TestUInt8Failure(t *testing.T) {
+	i := []byte{}
 	p := byteparse.UInt8()
-	i, o, err := p.Parse(elfMagicNumber)
-	assert.NoError(t, err)
-	assert.Equal(t, 3, len(i))
-	assert.Equal(t, uint8(0x7f), o)
+	_, _, err := p.Parse(i)
+	assert.Error(t, err)
 }

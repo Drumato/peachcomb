@@ -31,10 +31,8 @@ import (
 )
 
 func TestUInt16(t *testing.T) {
-	elfMagicNumber := []byte{0x7f, 0x45, 0x4c, 0x46}
+	i := []byte{}
 	p := byteparse.UInt16(binary.BigEndian)
-	i, o, err := p.Parse(elfMagicNumber)
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(i))
-	assert.Equal(t, uint16(0x7f45), o)
+	_, _, err := p.Parse(i)
+	assert.Error(t, err)
 }

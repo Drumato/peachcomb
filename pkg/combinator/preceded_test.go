@@ -30,13 +30,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPreceded(t *testing.T) {
+func TestPrecededPredecessorFailure(t *testing.T) {
 	predecessor := strparse.Rune('*')
 	successor := strparse.Rune('a')
 	p := combinator.Preceded(predecessor, successor)
 
-	i, o, err := p.Parse([]rune("*a"))
-	assert.NoError(t, err)
-	assert.Equal(t, "", string(i))
-	assert.Equal(t, 'a', o)
+	_, _, err := p.Parse([]rune("/a"))
+	assert.Error(t, err)
+}
+
+func TestPrecededSuccessorFailure(t *testing.T) {
+	predecessor := strparse.Rune('*')
+	successor := strparse.Rune('a')
+	p := combinator.Preceded(predecessor, successor)
+
+	_, _, err := p.Parse([]rune("*b"))
+	assert.Error(t, err)
 }

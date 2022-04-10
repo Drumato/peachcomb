@@ -29,26 +29,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTakewhile1(t *testing.T) {
+func TestTakewhile1SubFailureOnFirstApplication(t *testing.T) {
 	subP := combinator.Satisfy(func(ch rune) bool {
 		return ch == 'a'
 	})
 	p := combinator.TakeWhile1(subP)
 
-	i, o, err := p.Parse([]rune("aaaabaa"))
-	assert.NoError(t, err)
-	assert.Equal(t, "aaaa", string(o))
-	assert.Equal(t, "baa", string(i))
-}
-
-func TestTakewhile0(t *testing.T) {
-	subP := combinator.Satisfy(func(ch rune) bool {
-		return ch == 'a'
-	})
-	p := combinator.TakeWhile0(subP)
-
-	i, o, err := p.Parse([]rune("baa"))
-	assert.NoError(t, err)
-	assert.Equal(t, "", string(o))
-	assert.Equal(t, "baa", string(i))
+	_, _, err := p.Parse([]rune("bbbbb"))
+	assert.Error(t, err)
 }

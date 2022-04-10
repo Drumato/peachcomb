@@ -29,10 +29,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDigit1(t *testing.T) {
+func TestDigit1Failure(t *testing.T) {
 	p := strparse.Digit1()
-	i, o, err := p.Parse([]rune("11223344b"))
-	assert.NoError(t, err)
-	assert.Equal(t, "b", string(i))
-	assert.Equal(t, "11223344", o)
+	_, _, err := p.Parse([]rune("aabbccdd11223344"))
+	assert.Error(t, err)
 }

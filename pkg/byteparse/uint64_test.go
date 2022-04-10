@@ -30,11 +30,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUInt64(t *testing.T) {
-	i := []byte{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
+func TestUInt64Failure(t *testing.T) {
+	i := []byte{}
 	p := byteparse.UInt64(binary.BigEndian)
-	i, o, err := p.Parse(i)
-	assert.NoError(t, err)
-	assert.Equal(t, 0, len(i))
-	assert.Equal(t, uint64(0x102030405060708), o)
+	_, _, err := p.Parse(i)
+	assert.Error(t, err)
 }

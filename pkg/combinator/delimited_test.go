@@ -30,14 +30,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDelimited(t *testing.T) {
+func TestDelimitedBeginFailure(t *testing.T) {
 	begin := strparse.Rune('"')
 	contents := strparse.Digit1()
 	end := strparse.Rune('"')
 
 	p := combinator.Delimited(begin, contents, end)
-	i, o, err := p.Parse([]rune("\"12345\""))
-	assert.NoError(t, err)
-	assert.Equal(t, "", string(i))
-	assert.Equal(t, "12345", o)
+	_, _, err := p.Parse([]rune("'12345\""))
+	assert.Error(t, err)
+}
+
+func TestDelimitedContentsFailure(t *testing.T) {
+	begin := strparse.Rune('"')
+	contents := strparse.Digit1()
+	end := strparse.Rune('"')
+
+	p := combinator.Delimited(begin, contents, end)
+	_, _, err := p.Parse([]rune("\"abcde\""))
+	assert.Error(t, err)
+}
+
+func TestDelimitedEndFailure(t *testing.T) {
+	begin := strparse.Rune('"')
+	contents := strparse.Digit1()
+	end := strparse.Rune('"')
+
+	p := combinator.Delimited(begin, contents, end)
+	_, _, err := p.Parse([]rune("\"12345'"))
+	assert.Error(t, err)
 }

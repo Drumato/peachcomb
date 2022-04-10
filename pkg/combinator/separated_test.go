@@ -30,12 +30,29 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSeparated(t *testing.T) {
+func TestSeparated1FirstElementFailure(t *testing.T) {
 	element := strparse.Digit1()
 	separator := strparse.Rune('|')
 	p := combinator.Separated1(element, separator)
-	i, o, err := p.Parse([]rune("123|456|789"))
+	_, _, err := p.Parse([]rune("abc|abc|abc"))
+	assert.Error(t, err)
+}
+
+func TestSeparated1WithOneElement(t *testing.T) {
+	element := strparse.Digit1()
+	separator := strparse.Rune('|')
+	p := combinator.Separated1(element, separator)
+	i, o, err := p.Parse([]rune("123/123/123"))
 	assert.NoError(t, err)
-	assert.Equal(t, 3, len(o))
-	assert.Equal(t, "", string(i))
+	assert.Equal(t, "/123/123", string(i))
+	assert.Equal(t, 1, len(o))
+	assert.Equal(t, "123", o[0])
+}
+
+func TestSeparated1SecondElementFailure(t *testing.T) {
+	element := strparse.Digit1()
+	separator := strparse.Rune('|')
+	p := combinator.Separated1(element, separator)
+	_, _, err := p.Parse([]rune("123|abc|abc"))
+	assert.Error(t, err)
 }

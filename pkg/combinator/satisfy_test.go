@@ -29,11 +29,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSatisfy(t *testing.T) {
+func TestSatisfyFailure(t *testing.T) {
 	p := combinator.Satisfy(func(ch rune) bool { return ch == 'a' })
-	i, o, err := p.Parse([]rune("abc"))
+	_, _, err := p.Parse([]rune("bbc"))
 
-	assert.NoError(t, err)
-	assert.Equal(t, []rune("bc"), []rune(i))
-	assert.Equal(t, 'a', o)
+	assert.Error(t, err)
 }
