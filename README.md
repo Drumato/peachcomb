@@ -22,19 +22,21 @@ import (
 )
 
 func main() {
-	subsubP := strparse.Rune('a')
-	subP := strparse.TakeWhile1(subsubP)
-	p := combinator.Map(subP, func(s string) (int, error) { return len(s), nil })
-	i, o, err := p.Parse("aaaabaaaa")
+	element := strparse.Digit1()
+	separator := strparse.Rune('|')
+	p := combinator.Separated1(element, separator)
+	i, o, err := p.Parse([]rune("123|456|789Drumato"))
 	fmt.Println(i)
 	fmt.Printf("%d\n", o)
+	fmt.Printf("%s %s %s\n", o[0], o[1], o[2])
 	fmt.Println(err)
 }
 ```
 
 ```shell
 $ go run main.go
-baaaa
-4
+Drumato
+123 456 789
+3
 <nil>
 ```

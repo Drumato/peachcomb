@@ -23,18 +23,24 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-const s = `["foo","bar","baz"]`
-
-func main() {
-	_, v, err := jsonArrayParser().Parse([]rune(s))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
-		os.Exit(1)
+func TestParseJSONArray(t *testing.T) {
+	expected := []jsonValue{
+		jsonValueString("foo"),
+		jsonValueString("bar"),
+		jsonValueString("baz"),
 	}
+	s := `["foo","bar","baz"]`
+	i, o, err := jsonArrayParser().Parse([]rune(s))
+	assert.NoError(t, err)
+	assert.Equal(t, "", string(i))
+	assert.Equal(t, 3, o.length)
 
-	fmt.Println(v)
+	for i := range o.elements {
+		assert.Equal(t, expected[i], o.elements[i])
+	}
 }

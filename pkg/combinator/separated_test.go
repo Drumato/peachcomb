@@ -20,21 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package combinator_test
 
 import (
-	"fmt"
-	"os"
+	"testing"
+
+	"github.com/Drumato/goparsecomb/pkg/combinator"
+	"github.com/Drumato/goparsecomb/pkg/strparse"
+	"github.com/stretchr/testify/assert"
 )
 
-const s = `["foo","bar","baz"]`
-
-func main() {
-	_, v, err := jsonArrayParser().Parse([]rune(s))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Println(v)
+func TestSeparated(t *testing.T) {
+	element := strparse.Digit1()
+	separator := strparse.Rune('|')
+	p := combinator.Separated1(element, separator)
+	i, o, err := p.Parse([]rune("123|456|789"))
+	assert.NoError(t, err)
+	assert.Equal(t, 3, len(o))
+	assert.Equal(t, "", string(i))
 }

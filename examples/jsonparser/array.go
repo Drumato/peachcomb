@@ -23,18 +23,23 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"github.com/Drumato/goparsecomb/pkg/combinator"
+	"github.com/Drumato/goparsecomb/pkg/parser"
+	"github.com/Drumato/goparsecomb/pkg/strparse"
 )
 
-const s = `["foo","bar","baz"]`
+type jsonArray struct {
+	elements []jsonValue
+	length   int
+}
 
-func main() {
-	_, v, err := jsonArrayParser().Parse([]rune(s))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Println(v)
+func jsonArrayParser() parser.Parser[rune, jsonArray] {
+	begin := strparse.Rune('[')
+	end := strparse.Rune(']')
+	separator := strparse.Rune(',')
+	element := jsonValueParser()
+	contents := combinator.Separated1(element, separator)
+	return combinator.Map(combinator.Delimited(begin, contents, end), func(v []jsonValue) (jsonArray, error) {
+		return jsonArray{elements: v, length: len(v)}, nil
+	})
 }
