@@ -29,6 +29,22 @@ import (
 	"github.com/Drumato/goparsecomb/pkg/strparse"
 )
 
+func ExampleSeparated1() {
+	element := strparse.Digit1()
+	separator := strparse.Rune('|')
+	p := combinator.Separated1(element, separator)
+	i, o, err := p.Parse([]rune("123|456|789Drumato"))
+	fmt.Println(string(i))
+	fmt.Printf("%d\n", len(o))
+	fmt.Printf("%s %s %s\n", o[0], o[1], o[2])
+	fmt.Println(err)
+	// Output:
+	// Drumato
+	// 3
+	// 123 456 789
+	// <nil>
+}
+
 func ExampleSatisfy() {
 	i, o, err := combinator.Satisfy(func(ch rune) bool {
 		return ch == 'a'

@@ -55,12 +55,9 @@ func (p *takeWhileParser[E, SO]) Parse(input parser.ParseInput[E]) (parser.Parse
 	count := 0
 	output := make([]SO, 0)
 	var rest parser.ParseInput[E]
-	for {
+	for count < len(input) {
 		var o SO
 		var err error
-		if count >= len(input) {
-			break
-		}
 
 		rest, o, err = p.sub.Parse(input[count:])
 		if err != nil {
