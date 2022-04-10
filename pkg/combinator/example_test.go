@@ -44,6 +44,21 @@ func ExamplePreceded() {
 	// <nil>
 }
 
+func ExampleTerminated() {
+	predecessor := strparse.Rune('a')
+	successor := strparse.Rune('+')
+	p := combinator.Terminated(predecessor, successor)
+
+	i, o, err := p.Parse([]rune("a+"))
+	fmt.Println(string(i))
+	fmt.Printf("%c\n", o)
+	fmt.Println(err)
+	// Output:
+	//
+	// a
+	// <nil>
+}
+
 func ExampleSeparated1() {
 	element := strparse.Digit1()
 	separator := strparse.Rune('|')
