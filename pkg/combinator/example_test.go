@@ -29,6 +29,21 @@ import (
 	"github.com/Drumato/peachcomb/pkg/strparse"
 )
 
+func ExamplePreceded() {
+	predecessor := strparse.Rune('*')
+	successor := strparse.Rune('a')
+	p := combinator.Preceded(predecessor, successor)
+
+	i, o, err := p.Parse([]rune("*a"))
+	fmt.Println(string(i))
+	fmt.Printf("%c\n", o)
+	fmt.Println(err)
+	// Output:
+	//
+	// a
+	// <nil>
+}
+
 func ExampleSeparated1() {
 	element := strparse.Digit1()
 	separator := strparse.Rune('|')
