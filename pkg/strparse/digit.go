@@ -37,7 +37,7 @@ type digit1Parser struct{}
 
 // Parse implements parser.Parser[rune, string] interface.
 func (p *digit1Parser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
-	i, o, err := combinator.TakeWhile1(combinator.Satisfy(isDigit)).Parse(input)
+	i, o, err := combinator.Many1(combinator.Satisfy(isDigit)).Parse(input)
 	if err != nil {
 		return input, "", err
 	}

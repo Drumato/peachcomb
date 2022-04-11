@@ -91,7 +91,7 @@ func ExampleSatisfy() {
 
 func ExampleMap() {
 	subsubP := strparse.Rune('a')
-	subP := combinator.TakeWhile1(subsubP)
+	subP := combinator.Many1(subsubP)
 	p := combinator.Map(subP, func(s []rune) (int, error) { return len(s), nil })
 	i, o, err := p.Parse([]rune("aaaabaaaa"))
 	fmt.Println(string(i))
@@ -106,7 +106,7 @@ func ExampleMap() {
 func ExampleAlt() {
 	p1 := strparse.Rune('a')
 	p2 := strparse.Rune('b')
-	p := combinator.TakeWhile1(combinator.Alt(p1, p2))
+	p := combinator.Many1(combinator.Alt(p1, p2))
 
 	i, o, err := p.Parse([]rune("abababc"))
 	fmt.Println(string(i))
@@ -134,8 +134,8 @@ func ExampleDelimited() {
 	// <nil>
 }
 
-func ExampleTakeWhile0() {
-	p := combinator.TakeWhile0(strparse.Rune('a'))
+func ExampleMany0() {
+	p := combinator.Many0(strparse.Rune('a'))
 
 	i, o, err := p.Parse([]rune("baaaa"))
 	fmt.Println(string(i))
@@ -147,8 +147,8 @@ func ExampleTakeWhile0() {
 	// <nil>
 }
 
-func ExampleTakeWhile1() {
-	p := combinator.TakeWhile1(strparse.Rune('a'))
+func ExampleMany1() {
+	p := combinator.Many1(strparse.Rune('a'))
 
 	i, o, err := p.Parse([]rune("aaaabaa"))
 	fmt.Println(string(i))

@@ -28,26 +28,26 @@ import (
 	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-// TakeWhile0 initializes a parser that applies the given sub-parser several times.
-func TakeWhile0[E comparable, O parser.ParseOutput](sub parser.Parser[E, O]) parser.Parser[E, []O] {
-	return &takeWhileParser[E, O]{sub: sub, min: 0}
+// Many0 initializes a parser that applies the given sub-parser several times.
+func Many0[E comparable, O parser.ParseOutput](sub parser.Parser[E, O]) parser.Parser[E, []O] {
+	return &manyParser[E, O]{sub: sub, min: 0}
 }
 
-// TakeWhile1 initializes a parser that applies the given sub-parser several times.
+// Many1 initializes a parser that applies the given sub-parser several times.
 // if the sub parser fails to parse and the count of application times is 0
 // TakeWhile1 parser return an error.
-func TakeWhile1[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO]) parser.Parser[E, []SO] {
-	return &takeWhileParser[E, SO]{sub: sub, min: 1}
+func Many1[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO]) parser.Parser[E, []SO] {
+	return &manyParser[E, SO]{sub: sub, min: 1}
 }
 
-// takeWhileParser is the actual implementation of TakeWhile0/1 parser.
-type takeWhileParser[E comparable, SO parser.ParseOutput] struct {
+// manyParser is the actual implementation of TakeWhile0/1 parser.
+type manyParser[E comparable, SO parser.ParseOutput] struct {
 	sub parser.Parser[E, SO]
 	min uint
 }
 
 // Parse implements parser.Parser[E comparable, []SO] interface
-func (p *takeWhileParser[E, SO]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], []SO, parser.ParseError) {
+func (p *manyParser[E, SO]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], []SO, parser.ParseError) {
 	if len(input) == 0 {
 		return input, nil, &parser.NoLeftInputToParseError{}
 	}
