@@ -62,7 +62,7 @@ func (p *satisfyParser[E]) Parse(input parser.ParseInput[E]) (parser.ParseInput[
 
 // NotsatisfiedError notifies that the given predicate is not satisfied.
 type NotSatisfiedError[E comparable] struct {
-	// actual is the given rune that satisfyParser consumed
+	// actual is the given element that satisfyParser consumed
 	actual E
 }
 

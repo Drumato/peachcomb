@@ -25,7 +25,7 @@ package combinator
 import "github.com/Drumato/peachcomb/pkg/parser"
 
 // Alt initializes a parser that applies all given parsers.
-// if them of all given are failed to parse, Alt() parser also returns a error.
+// if all of them are failed to parse, Alt() parser also returns an error.
 // otherwise Alt() succeeds to parse.
 func Alt[E comparable, O parser.ParseOutput](parsers ...parser.Parser[E, O]) parser.Parser[E, O] {
 	return &altParser[E, O]{parsers: parsers}
@@ -51,13 +51,13 @@ func (p *altParser[E, O]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E
 		}
 	}
 
-	return subI, subO, &AllParsersFailledError{}
+	return subI, subO, &AllParsersFailedError{}
 }
 
-// AllParsersFailledError notifies all of given parsers are failed to parse.
-type AllParsersFailledError struct{}
+// AllParsersFailedError notifies all of given parsers are failed to parse.
+type AllParsersFailedError struct{}
 
 // Error implements error interface.
-func (e *AllParsersFailledError) Error() string {
+func (e *AllParsersFailedError) Error() string {
 	return "all of given parser failed to parse"
 }

@@ -25,7 +25,9 @@ package combinator_test
 import (
 	"fmt"
 
+	"github.com/Drumato/peachcomb/pkg/byteparse"
 	"github.com/Drumato/peachcomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/parser"
 	"github.com/Drumato/peachcomb/pkg/strparse"
 )
 
@@ -157,5 +159,23 @@ func ExampleMany1() {
 	// Output:
 	// baa
 	// aaaa
+	// <nil>
+}
+
+func ExampleBranches() {
+	m := make(map[byte]parser.Parser[byte, string])
+	m[0x00] = combinator.Map(byteparse.UInt8(), func(v uint8) (string, error) { return "0x00", nil })
+	m[0x01] = combinator.Map(byteparse.UInt8(), func(v uint8) (string, error) { return "0x01", nil })
+
+	p := combinator.Many1(combinator.Branches(m))
+	i, o, err := p.Parse([]byte{0x00, 0x01, 0x00, 0x01, 0x02})
+	fmt.Println(i)
+	fmt.Println(len(o))
+	fmt.Printf("%s %s %s %s\n", o[0], o[1], o[2], o[3])
+	fmt.Println(err)
+	// Output:
+	// [2]
+	// 4
+	// 0x00 0x01 0x00 0x01
 	// <nil>
 }
