@@ -36,11 +36,12 @@ type jsonValue interface {
 type jsonValueString string
 type jsonValueInteger int
 
-func jsonValueParser() parser.Parser[rune, jsonValue] {
-	return combinator.Alt(jsonStringValueParser(), jsonNumberValueParser(), jsonArrayValueParser())
+func parseJSONValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
+	p := combinator.Alt(parseJSONStringValue, parseJSONNumberValue, parseJSONArrayValue)
+	return p(input)
 }
 
-func jsonStringValueParser() parser.Parser[rune, jsonValue] {
+func parseJSONStringValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
 	begin := strparse.Rune('"')
 	contents := combinator.Many0(combinator.Satisfy(func(ch rune) bool { return ch != '"' }))
 	end := strparse.Rune('"')
@@ -48,14 +49,16 @@ func jsonStringValueParser() parser.Parser[rune, jsonValue] {
 		return jsonValueString(s), nil
 	})
 
-	return p
+	return p(input)
 }
 
-func jsonNumberValueParser() parser.Parser[rune, jsonValue] {
-	return combinator.Map(strparse.Digit1(), func(s string) (jsonValue, error) {
+func parseJSONNumberValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
+	p := combinator.Map(strparse.Digit1(), func(s string) (jsonValue, error) {
 		v, err := strconv.ParseInt(s, 10, 64)
 		return jsonValueInteger(v), err
 	})
+
+	return p(input)
 }
 
 type jsonArrayValue struct {
@@ -63,13 +66,14 @@ type jsonArrayValue struct {
 	length   int
 }
 
-func jsonArrayValueParser() parser.Parser[rune, jsonValue] {
+func parseJSONArrayValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
 	begin := strparse.Rune('[')
 	end := strparse.Rune(']')
 	separator := strparse.Rune(',')
-	element := jsonValueParser()
+	element := parseJSONValue
 	contents := combinator.Separated1(element, separator)
-	return combinator.Map(combinator.Delimited(begin, contents, end), func(v []jsonValue) (jsonValue, error) {
+	p := combinator.Map(combinator.Delimited(begin, contents, end), func(v []jsonValue) (jsonValue, error) {
 		return jsonArrayValue{elements: v, length: len(v)}, nil
 	})
+	return p(input)
 }

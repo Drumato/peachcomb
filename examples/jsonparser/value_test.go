@@ -28,21 +28,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseJSONValueOnString(t *testing.T) {
-	i, o, err := jsonValueParser()([]rune("\"Drumato\""))
+func TestParseJSONStringValue(t *testing.T) {
+	i, o, err := parseJSONStringValue([]rune("\"Drumato\""))
 	assert.NoError(t, err)
 	assert.Equal(t, jsonValueString("Drumato"), o)
 	assert.Equal(t, "", string(i))
 }
 
-func TestParseJSONValueOnNumber(t *testing.T) {
-	i, o, err := jsonValueParser()([]rune("12345"))
+func TestParseJSONNumberValue(t *testing.T) {
+	i, o, err := parseJSONNumberValue([]rune("12345"))
 	assert.NoError(t, err)
 	assert.Equal(t, jsonValueInteger(12345), o)
 	assert.Equal(t, "", string(i))
 }
 
-func TestParseJSONValueOnArray(t *testing.T) {
+func TestParseJSONArrayValue(t *testing.T) {
 	expected := jsonArrayValue{
 		elements: []jsonValue{
 			jsonValueString("foo"),
@@ -51,7 +51,41 @@ func TestParseJSONValueOnArray(t *testing.T) {
 		},
 		length: 3,
 	}
-	i, o, err := jsonValueParser()([]rune(`["foo","bar","baz"]`))
+	i, o, err := parseJSONArrayValue([]rune(`["foo","bar","baz"]`))
+	assert.NoError(t, err)
+	assert.Equal(t, expected, o)
+	assert.Equal(t, "", string(i))
+}
+
+func TestParseJSONArrayValueWith2d(t *testing.T) {
+	s := []rune(`[["a","b"],["c","d"],["e","f"]]`)
+	expected := jsonArrayValue{
+		elements: []jsonValue{
+			jsonArrayValue{
+				elements: []jsonValue{
+					jsonValueString("a"),
+					jsonValueString("b"),
+				},
+				length: 2,
+			},
+			jsonArrayValue{
+				elements: []jsonValue{
+					jsonValueString("c"),
+					jsonValueString("d"),
+				},
+				length: 2,
+			},
+			jsonArrayValue{
+				elements: []jsonValue{
+					jsonValueString("e"),
+					jsonValueString("f"),
+				},
+				length: 2,
+			},
+		},
+		length: 3,
+	}
+	i, o, err := parseJSONArrayValue(s)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, o)
 	assert.Equal(t, "", string(i))
