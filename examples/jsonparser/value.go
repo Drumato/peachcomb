@@ -23,57 +23,17 @@
 package main
 
 import (
-	"strconv"
-
 	"github.com/Drumato/peachcomb/pkg/combinator"
 	"github.com/Drumato/peachcomb/pkg/parser"
-	"github.com/Drumato/peachcomb/pkg/strparse"
 )
 
 type jsonValue interface {
 }
 
-type jsonValueString string
-type jsonValueInteger int
-
 func parseJSONValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
-	p := combinator.Alt(parseJSONStringValue, parseJSONNumberValue, parseJSONArrayValue)
-	return p(input)
-}
-
-func parseJSONStringValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
-	begin := strparse.Rune('"')
-	contents := combinator.Many0(combinator.Satisfy(func(ch rune) bool { return ch != '"' }))
-	end := strparse.Rune('"')
-	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s []rune) (jsonValue, error) {
-		return jsonValueString(s), nil
-	})
-
-	return p(input)
-}
-
-func parseJSONNumberValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
-	p := combinator.Map(strparse.Digit1(), func(s string) (jsonValue, error) {
-		v, err := strconv.ParseInt(s, 10, 64)
-		return jsonValueInteger(v), err
-	})
-
-	return p(input)
-}
-
-type jsonArrayValue struct {
-	elements []jsonValue
-	length   int
-}
-
-func parseJSONArrayValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
-	begin := strparse.Rune('[')
-	end := strparse.Rune(']')
-	separator := strparse.Rune(',')
-	element := parseJSONValue
-	contents := combinator.Separated1(element, separator)
-	p := combinator.Map(combinator.Delimited(begin, contents, end), func(v []jsonValue) (jsonValue, error) {
-		return jsonArrayValue{elements: v, length: len(v)}, nil
-	})
+	begin := parseJSONWhitespace
+	contents := combinator.Alt(parseJSONStringValue, parseJSONNumberValue, parseJSONArrayValue)
+	end := parseJSONWhitespace
+	p := combinator.Delimited(begin, contents, end)
 	return p(input)
 }

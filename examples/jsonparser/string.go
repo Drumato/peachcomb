@@ -23,14 +23,20 @@
 package main
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/Drumato/peachcomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/strparse"
 )
 
-func TestParseJSONValue(t *testing.T) {
-	i, o, err := parseJSONValue([]rune("     12345     "))
-	assert.NoError(t, err)
-	assert.Equal(t, jsonValueInteger(12345), o)
-	assert.Equal(t, "", string(i))
+type jsonValueString string
+
+func parseJSONStringValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
+	begin := strparse.Rune('"')
+	contents := combinator.Many0(combinator.Satisfy(func(ch rune) bool { return ch != '"' }))
+	end := strparse.Rune('"')
+	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s []rune) (jsonValue, error) {
+		return jsonValueString(s), nil
+	})
+
+	return p(input)
 }

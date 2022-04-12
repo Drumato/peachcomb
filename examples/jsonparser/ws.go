@@ -23,14 +23,13 @@
 package main
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/Drumato/peachcomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-func TestParseJSONValue(t *testing.T) {
-	i, o, err := parseJSONValue([]rune("     12345     "))
-	assert.NoError(t, err)
-	assert.Equal(t, jsonValueInteger(12345), o)
-	assert.Equal(t, "", string(i))
+func parseJSONWhitespace(input parser.ParseInput[rune]) (parser.ParseInput[rune], []rune, parser.ParseError) {
+	p := combinator.Many0(combinator.Satisfy(func(ch rune) bool {
+		return ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t'
+	}))
+	return p(input)
 }

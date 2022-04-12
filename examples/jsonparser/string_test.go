@@ -28,9 +28,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseJSONValue(t *testing.T) {
-	i, o, err := parseJSONValue([]rune("     12345     "))
+func TestParseJSONStringValue(t *testing.T) {
+	i, o, err := parseJSONStringValue([]rune("\"Drumato\""))
 	assert.NoError(t, err)
-	assert.Equal(t, jsonValueInteger(12345), o)
+	assert.Equal(t, jsonValueString("Drumato"), o)
 	assert.Equal(t, "", string(i))
 }
