@@ -25,43 +25,37 @@ package combinator
 import "github.com/Drumato/peachcomb/pkg/parser"
 
 func Separated1[E comparable, EO parser.ParseOutput, SO parser.ParseOutput](element parser.Parser[E, EO], separator parser.Parser[E, SO]) parser.Parser[E, []EO] {
-	return &separatedParser[E, EO, SO]{element, separator}
-}
+	return func(input parser.ParseInput[E]) (parser.ParseInput[E], []EO, parser.ParseError) {
 
-type separatedParser[E comparable, EO parser.ParseOutput, SO parser.ParseOutput] struct {
-	element   parser.Parser[E, EO]
-	separator parser.Parser[E, SO]
-}
-
-func (p *separatedParser[E, EO, SO]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], []EO, parser.ParseError) {
-	output := make([]EO, 0)
-	rest, e1, err := p.element.Parse(input)
-	if err != nil {
-		return rest, output, err
-	}
-
-	output = append(output, e1)
-
-	for {
-		var eo EO
-
-		// we mustn't generate an error if separator parser fails
-		// because such as case is the end of the separated-list.
-		rest, _, err = p.separator.Parse(rest)
+		output := make([]EO, 0)
+		rest, e1, err := element(input)
 		if err != nil {
-			break
-		}
-
-		rest, eo, err = p.element.Parse(rest)
-		if err != nil {
-			// must generate an error.
 			return rest, output, err
 		}
 
-		output = append(output, eo)
-	}
+		output = append(output, e1)
 
-	// we mustn't return err if separator parser fails
-	// because such as case is the end of the separated-list.
-	return rest, output, nil
+		for {
+			var eo EO
+
+			// we mustn't generate an error if separator parser fails
+			// because such as case is the end of the separated-list.
+			rest, _, err = separator(rest)
+			if err != nil {
+				break
+			}
+
+			rest, eo, err = element(rest)
+			if err != nil {
+				// must generate an error.
+				return rest, output, err
+			}
+
+			output = append(output, eo)
+		}
+
+		// we mustn't return err if separator parser fails
+		// because such as case is the end of the separated-list.
+		return rest, output, nil
+	}
 }

@@ -32,6 +32,6 @@ import (
 func TestUInt8Failure(t *testing.T) {
 	i := []byte{}
 	p := byteparse.UInt8()
-	_, _, err := p.Parse(i)
+	_, _, err := p(i)
 	assert.Error(t, err)
 }

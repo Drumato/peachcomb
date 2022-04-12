@@ -28,30 +28,22 @@ import "github.com/Drumato/peachcomb/pkg/parser"
 // if all of them are failed to parse, Alt() parser also returns an error.
 // otherwise Alt() succeeds to parse.
 func Alt[E comparable, O parser.ParseOutput](parsers ...parser.Parser[E, O]) parser.Parser[E, O] {
-	return &altParser[E, O]{parsers: parsers}
-}
+	return func(input parser.ParseInput[E]) (parser.ParseInput[E], O, parser.ParseError) {
+		// subI holds the rest input in outer scope of for-statement.
+		var subI parser.ParseInput[E]
+		var subO O
 
-// altParser is the actual implementation of Alt() parser.
-type altParser[E comparable, O parser.ParseOutput] struct {
-	parsers []parser.Parser[E, O]
-}
+		for _, subP := range parsers {
+			var err parser.ParseError
 
-// Parse implements parser.Parser[E comparable, O parser.ParseOutput] interface.
-func (p *altParser[E, O]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], O, parser.ParseError) {
-	// subI holds the rest input in outer scope of for-statement.
-	var subI parser.ParseInput[E]
-	var subO O
-
-	for _, subP := range p.parsers {
-		var err parser.ParseError
-
-		subI, subO, err = subP.Parse(input)
-		if err == nil {
-			return subI, subO, nil
+			subI, subO, err = subP(input)
+			if err == nil {
+				return subI, subO, nil
+			}
 		}
-	}
 
-	return subI, subO, &AllParsersFailedError{}
+		return subI, subO, &AllParsersFailedError{}
+	}
 }
 
 // AllParsersFailedError notifies all of given parsers are failed to parse.

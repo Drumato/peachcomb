@@ -31,22 +31,12 @@ import (
 // Uint32 initializes a parser that parse 32-bit unsigned integer.
 // user can determine the behavior of this parser by giving byteorder what you want to use.
 func UInt32(byteorder binary.ByteOrder) parser.Parser[byte, uint32] {
-	return &uint32Parser{byteorder: byteorder}
-}
+	return func(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint32, parser.ParseError) {
+		if len(input) < 4 {
+			return nil, 0, &parser.NoLeftInputToParseError{}
+		}
 
-// uint32Parser is the actual implementation of Uint32().
-type uint32Parser struct {
-	byteorder binary.ByteOrder
-}
-
-var _ parser.Parser[byte, uint32] = &uint32Parser{}
-
-// Parse implements parser.Parser[byte, uint32] interface.
-func (p *uint32Parser) Parse(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint32, parser.ParseError) {
-	if len(input) < 4 {
-		return nil, 0, &parser.NoLeftInputToParseError{}
+		v := byteorder.Uint32(input)
+		return input[4:], v, nil
 	}
-
-	v := p.byteorder.Uint32(input)
-	return input[4:], v, nil
 }

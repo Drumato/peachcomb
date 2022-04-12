@@ -22,13 +22,9 @@
 
 package parser
 
-// Parser is an abstract parser that parses string.
-// All parsers in package strparse implements this interface.
+// Parser is an abstract parser that parses any slices.
 // input must be a slice of certain type that implements comparable builtin interface.
-type Parser[E comparable, O ParseOutput] interface {
-	// Parse parses the input and convert the consumed stuff to O actually.
-	Parse(input ParseInput[E]) (ParseInput[E], O, ParseError)
-}
+type Parser[E comparable, O ParseOutput] func(input ParseInput[E]) (ParseInput[E], O, ParseError)
 
 // ParseInput is the input of Parser interface.
 // It's just a slice of [E comparable].

@@ -31,22 +31,12 @@ import (
 // Uint64 initializes a parser that parse 64-bit unsigned integer.
 // user can determine the behavior of this parser by giving byteorder what you want to use.
 func UInt64(byteorder binary.ByteOrder) parser.Parser[byte, uint64] {
-	return &uint64Parser{byteorder: byteorder}
-}
+	return func(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint64, parser.ParseError) {
+		if len(input) < 8 {
+			return nil, 0, &parser.NoLeftInputToParseError{}
+		}
 
-// uint64Parser is the actual implementation of Uint64().
-type uint64Parser struct {
-	byteorder binary.ByteOrder
-}
-
-var _ parser.Parser[byte, uint64] = &uint64Parser{}
-
-// Parse implements parser.Parser[byte, uint64] interface.
-func (p *uint64Parser) Parse(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint64, parser.ParseError) {
-	if len(input) < 8 {
-		return nil, 0, &parser.NoLeftInputToParseError{}
+		v := byteorder.Uint64(input)
+		return input[8:], v, nil
 	}
-
-	v := p.byteorder.Uint64(input)
-	return input[8:], v, nil
 }

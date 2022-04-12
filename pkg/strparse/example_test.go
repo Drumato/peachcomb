@@ -29,7 +29,7 @@ import (
 )
 
 func ExampleRune() {
-	i, o, err := strparse.Rune('a').Parse([]rune("abc"))
+	i, o, err := strparse.Rune('a')([]rune("abc"))
 	fmt.Println(string(i))
 	fmt.Printf("%c\n", o)
 	fmt.Println(err)
@@ -41,7 +41,7 @@ func ExampleRune() {
 }
 
 func ExampleTag() {
-	i, o, err := strparse.Tag("Drum").Parse([]rune("Drumato"))
+	i, o, err := strparse.Tag("Drum")([]rune("Drumato"))
 	fmt.Println(string(i))
 	fmt.Println(o)
 	fmt.Println(err)
@@ -53,7 +53,7 @@ func ExampleTag() {
 }
 
 func ExampleDigit1() {
-	i, o, err := strparse.Digit1().Parse([]rune("112233abc"))
+	i, o, err := strparse.Digit1()([]rune("112233abc"))
 	fmt.Println(string(i))
 	fmt.Println(o)
 	fmt.Println(err)

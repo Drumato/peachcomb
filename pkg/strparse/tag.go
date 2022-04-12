@@ -30,29 +30,19 @@ import (
 
 // Tag initializes a parser that checks the input starts with the tag prefix.
 func Tag(tag string) parser.Parser[rune, string] {
-	return &tagParser{
-		tag: tag,
+	return func(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
+		t := []rune(tag)
+		if len(input) < len(t) {
+			return input, "", &parser.NoLeftInputToParseError{}
+		}
+
+		unmatched := !hasPrefix(input, t)
+		if unmatched {
+			return input, "", &UnexpectedPrefixError{expected: tag}
+		}
+
+		return input[len(t):], tag, nil
 	}
-}
-
-// tagParser is the actual implementation of Parser interface.
-type tagParser struct {
-	tag string
-}
-
-// Parse implements Parser[rune, string] interface.
-func (p *tagParser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
-	tag := []rune(p.tag)
-	if len(input) < len(tag) {
-		return input, "", &parser.NoLeftInputToParseError{}
-	}
-
-	unmatched := !hasPrefix(input, tag)
-	if unmatched {
-		return input, "", &UnexpectedPrefixError{expected: p.tag}
-	}
-
-	return input[len(tag):], p.tag, nil
 }
 
 // UnexpectedPrefixError notifies the prefix of the given input is unexpected.

@@ -31,7 +31,7 @@ import (
 
 func TestSatisfyFailure(t *testing.T) {
 	p := combinator.Satisfy(func(ch rune) bool { return ch == 'a' })
-	_, _, err := p.Parse([]rune("bbc"))
+	_, _, err := p([]rune("bbc"))
 
 	assert.Error(t, err)
 }

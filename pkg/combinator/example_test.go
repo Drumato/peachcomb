@@ -36,7 +36,7 @@ func ExamplePreceded() {
 	successor := strparse.Rune('a')
 	p := combinator.Preceded(predecessor, successor)
 
-	i, o, err := p.Parse([]rune("*a"))
+	i, o, err := p([]rune("*a"))
 	fmt.Println(string(i))
 	fmt.Printf("%c\n", o)
 	fmt.Println(err)
@@ -51,7 +51,7 @@ func ExampleTerminated() {
 	successor := strparse.Rune('+')
 	p := combinator.Terminated(predecessor, successor)
 
-	i, o, err := p.Parse([]rune("a+"))
+	i, o, err := p([]rune("a+"))
 	fmt.Println(string(i))
 	fmt.Printf("%c\n", o)
 	fmt.Println(err)
@@ -65,7 +65,7 @@ func ExampleSeparated1() {
 	element := strparse.Digit1()
 	separator := strparse.Rune('|')
 	p := combinator.Separated1(element, separator)
-	i, o, err := p.Parse([]rune("123|456|789Drumato"))
+	i, o, err := p([]rune("123|456|789Drumato"))
 	fmt.Println(string(i))
 	fmt.Printf("%d\n", len(o))
 	fmt.Printf("%s %s %s\n", o[0], o[1], o[2])
@@ -80,7 +80,7 @@ func ExampleSeparated1() {
 func ExampleSatisfy() {
 	i, o, err := combinator.Satisfy(func(ch rune) bool {
 		return ch == 'a'
-	}).Parse([]rune("abc"))
+	})([]rune("abc"))
 	fmt.Println(string(i))
 	fmt.Printf("%c\n", o)
 	fmt.Println(err)
@@ -95,7 +95,7 @@ func ExampleMap() {
 	subsubP := strparse.Rune('a')
 	subP := combinator.Many1(subsubP)
 	p := combinator.Map(subP, func(s []rune) (int, error) { return len(s), nil })
-	i, o, err := p.Parse([]rune("aaaabaaaa"))
+	i, o, err := p([]rune("aaaabaaaa"))
 	fmt.Println(string(i))
 	fmt.Println(o)
 	fmt.Println(err)
@@ -110,7 +110,7 @@ func ExampleAlt() {
 	p2 := strparse.Rune('b')
 	p := combinator.Many1(combinator.Alt(p1, p2))
 
-	i, o, err := p.Parse([]rune("abababc"))
+	i, o, err := p([]rune("abababc"))
 	fmt.Println(string(i))
 	fmt.Println(string(o))
 	fmt.Println(err)
@@ -126,7 +126,7 @@ func ExampleDelimited() {
 	contents := strparse.Digit1()
 	p := combinator.Delimited(begin, contents, end)
 
-	i, o, err := p.Parse([]rune("(12321)"))
+	i, o, err := p([]rune("(12321)"))
 	fmt.Println(string(i))
 	fmt.Println(o)
 	fmt.Println(err)
@@ -139,7 +139,7 @@ func ExampleDelimited() {
 func ExampleMany0() {
 	p := combinator.Many0(strparse.Rune('a'))
 
-	i, o, err := p.Parse([]rune("baaaa"))
+	i, o, err := p([]rune("baaaa"))
 	fmt.Println(string(i))
 	fmt.Println(string(o))
 	fmt.Println(err)
@@ -152,7 +152,7 @@ func ExampleMany0() {
 func ExampleMany1() {
 	p := combinator.Many1(strparse.Rune('a'))
 
-	i, o, err := p.Parse([]rune("aaaabaa"))
+	i, o, err := p([]rune("aaaabaa"))
 	fmt.Println(string(i))
 	fmt.Println(string(o))
 	fmt.Println(err)
@@ -168,7 +168,7 @@ func ExampleBranches() {
 	m[0x01] = combinator.Map(byteparse.UInt8(), func(v uint8) (string, error) { return "0x01", nil })
 
 	p := combinator.Many1(combinator.Branches(m))
-	i, o, err := p.Parse([]byte{0x00, 0x01, 0x00, 0x01, 0x02})
+	i, o, err := p([]byte{0x00, 0x01, 0x00, 0x01, 0x02})
 	fmt.Println(i)
 	fmt.Println(len(o))
 	fmt.Printf("%s %s %s %s\n", o[0], o[1], o[2], o[3])

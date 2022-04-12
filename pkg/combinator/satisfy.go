@@ -30,35 +30,24 @@ import (
 
 // Satisfy initializes a parser that checks the head of the input satisfies the predicate.
 func Satisfy[E comparable](pred Predicate[E]) parser.Parser[E, E] {
-	return &satisfyParser[E]{
-		pred: pred,
-	}
-}
+	return func(input parser.ParseInput[E]) (parser.ParseInput[E], E, parser.ParseError) {
+		var e E
+		if len(input) == 0 {
+			return input, e, &parser.NoLeftInputToParseError{}
+		}
 
-// satisfyParser is the actual implementation of Parser interface
-type satisfyParser[E comparable] struct {
-	pred Predicate[E]
+		e = input[0]
+		notSatisfied := !pred(e)
+		if notSatisfied {
+			return input, e, &NotSatisfiedError[E]{actual: e}
+		}
+
+		return input[1:], e, nil
+	}
 }
 
 // Predicate is the condition that satisfyParser uses for consuming one element.
 type Predicate[E comparable] func(element E) bool
-
-// Parse implements parser.Parser[E comparable, E parser.ParseOutput] interface
-// NOTE: we should think about considering E as parser.ParseOutput. Are there any concerns about it?
-func (p *satisfyParser[E]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], E, parser.ParseError) {
-	var e E
-	if len(input) == 0 {
-		return input, e, &parser.NoLeftInputToParseError{}
-	}
-
-	e = input[0]
-	notSatisfied := !p.pred(e)
-	if notSatisfied {
-		return input, e, &NotSatisfiedError[E]{actual: e}
-	}
-
-	return input[1:], e, nil
-}
 
 // NotsatisfiedError notifies that the given predicate is not satisfied.
 type NotSatisfiedError[E comparable] struct {

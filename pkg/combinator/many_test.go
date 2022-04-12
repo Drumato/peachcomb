@@ -35,6 +35,6 @@ func TestMany1SubFailureOnFirstApplication(t *testing.T) {
 	})
 	p := combinator.Many1(subP)
 
-	_, _, err := p.Parse([]rune("bbbbb"))
+	_, _, err := p([]rune("bbbbb"))
 	assert.Error(t, err)
 }

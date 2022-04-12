@@ -29,50 +29,47 @@ import (
 )
 
 // Many0 initializes a parser that applies the given sub-parser several times.
-func Many0[E comparable, O parser.ParseOutput](sub parser.Parser[E, O]) parser.Parser[E, []O] {
-	return &manyParser[E, O]{sub: sub, min: 0}
+func Many0[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO]) parser.Parser[E, []SO] {
+	return many(sub, 0)
 }
 
 // Many1 initializes a parser that applies the given sub-parser several times.
 // if the sub parser fails to parse and the count of application times is 0
-// TakeWhile1 parser return an error.
+// Many11 parser return an error.
 func Many1[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO]) parser.Parser[E, []SO] {
-	return &manyParser[E, SO]{sub: sub, min: 1}
+	return many(sub, 1)
 }
 
-// manyParser is the actual implementation of TakeWhile0/1 parser.
-type manyParser[E comparable, SO parser.ParseOutput] struct {
-	sub parser.Parser[E, SO]
-	min uint
-}
-
-// Parse implements parser.Parser[E comparable, []SO] interface
-func (p *manyParser[E, SO]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], []SO, parser.ParseError) {
-	if len(input) == 0 {
-		return input, nil, &parser.NoLeftInputToParseError{}
-	}
-
-	count := 0
-	output := make([]SO, 0)
-	var rest parser.ParseInput[E]
-	for count < len(input) {
-		var o SO
-		var err error
-
-		rest, o, err = p.sub.Parse(input[count:])
-		if err != nil {
-			break
+// many is the actual implementation of Many0/1.
+func many[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], min uint) parser.Parser[E, []SO] {
+	return func(input parser.ParseInput[E]) (parser.ParseInput[E], []SO, parser.ParseError) {
+		if len(input) == 0 {
+			return input, nil, &parser.NoLeftInputToParseError{}
 		}
-		count++
 
-		output = append(output, o)
+		count := 0
+		output := make([]SO, 0)
+		var rest parser.ParseInput[E]
+		for count < len(input) {
+			var o SO
+			var err error
+
+			rest, o, err = sub(input[count:])
+			if err != nil {
+				break
+			}
+			count++
+
+			output = append(output, o)
+		}
+
+		if count < int(min) {
+			return rest, output, &NotSatisfiedCountError{}
+		}
+
+		return rest, output, nil
+
 	}
-
-	if count < int(p.min) {
-		return rest, output, &NotSatisfiedCountError{}
-	}
-
-	return rest, output, nil
 }
 
 // NotSatisfiedCountError notifies the count of sub-parser success are not satisfied.

@@ -34,7 +34,7 @@ func TestSeparated1FirstElementFailure(t *testing.T) {
 	element := strparse.Digit1()
 	separator := strparse.Rune('|')
 	p := combinator.Separated1(element, separator)
-	_, _, err := p.Parse([]rune("abc|abc|abc"))
+	_, _, err := p([]rune("abc|abc|abc"))
 	assert.Error(t, err)
 }
 
@@ -42,7 +42,7 @@ func TestSeparated1WithOneElement(t *testing.T) {
 	element := strparse.Digit1()
 	separator := strparse.Rune('|')
 	p := combinator.Separated1(element, separator)
-	i, o, err := p.Parse([]rune("123/123/123"))
+	i, o, err := p([]rune("123/123/123"))
 	assert.NoError(t, err)
 	assert.Equal(t, "/123/123", string(i))
 	assert.Equal(t, 1, len(o))
@@ -53,6 +53,6 @@ func TestSeparated1SecondElementFailure(t *testing.T) {
 	element := strparse.Digit1()
 	separator := strparse.Rune('|')
 	p := combinator.Separated1(element, separator)
-	_, _, err := p.Parse([]rune("123|abc|abc"))
+	_, _, err := p([]rune("123|abc|abc"))
 	assert.Error(t, err)
 }

@@ -37,7 +37,7 @@ type jsonValueString string
 type jsonValueInteger int
 
 func jsonValueParser() parser.Parser[rune, jsonValue] {
-	return combinator.Alt(jsonStringValueParser(), jsonNumberValueParser())
+	return combinator.Alt(jsonStringValueParser(), jsonNumberValueParser(), jsonArrayValueParser())
 }
 
 func jsonStringValueParser() parser.Parser[rune, jsonValue] {
@@ -55,5 +55,21 @@ func jsonNumberValueParser() parser.Parser[rune, jsonValue] {
 	return combinator.Map(strparse.Digit1(), func(s string) (jsonValue, error) {
 		v, err := strconv.ParseInt(s, 10, 64)
 		return jsonValueInteger(v), err
+	})
+}
+
+type jsonArrayValue struct {
+	elements []jsonValue
+	length   int
+}
+
+func jsonArrayValueParser() parser.Parser[rune, jsonValue] {
+	begin := strparse.Rune('[')
+	end := strparse.Rune(']')
+	separator := strparse.Rune(',')
+	element := jsonValueParser()
+	contents := combinator.Separated1(element, separator)
+	return combinator.Map(combinator.Delimited(begin, contents, end), func(v []jsonValue) (jsonValue, error) {
+		return jsonArrayValue{elements: v, length: len(v)}, nil
 	})
 }

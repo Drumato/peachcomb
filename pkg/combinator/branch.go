@@ -35,28 +35,20 @@ import (
 // if no applicable rule exists in the rules, Branches() parser returns an error.
 // if all of them are failed to parse, Branches() parser also returns an error.
 func Branches[E comparable, O parser.ParseOutput](rules map[E]parser.Parser[E, O]) parser.Parser[E, O] {
-	return &branchesParser[E, O]{rules}
-}
+	return func(input parser.ParseInput[E]) (parser.ParseInput[E], O, parser.ParseError) {
+		var o O
+		if len(input) == 0 {
+			return input, o, &parser.NoLeftInputToParseError{}
+		}
 
-// branchesParser is the actual implementation of Branches() parser.
-type branchesParser[E comparable, O parser.ParseOutput] struct {
-	rules map[E]parser.Parser[E, O]
-}
+		e := input[0]
+		sub, ok := rules[e]
+		if !ok {
+			return input, o, &parser.NoLeftInputToParseError{}
+		}
 
-// Parse implements parser.Parser[E comparable, O parser.ParseOutput] interface.
-func (p *branchesParser[E, O]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], O, parser.ParseError) {
-	var o O
-	if len(input) == 0 {
-		return input, o, &parser.NoLeftInputToParseError{}
+		return sub(input)
 	}
-
-	e := input[0]
-	sub, ok := p.rules[e]
-	if !ok {
-		return input, o, &parser.NoLeftInputToParseError{}
-	}
-
-	return sub.Parse(input)
 }
 
 // ApplicableRuleIsNotFoundError notifies all of given parsers don't match the head of the input.
