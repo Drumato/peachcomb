@@ -35,6 +35,6 @@ func TestAltChildrenFailure(t *testing.T) {
 	p2 := strparse.Rune('b')
 	p := combinator.Alt(p1, p2)
 
-	_, _, err := p.Parse([]rune("c"))
+	_, _, err := p([]rune("c"))
 	assert.Error(t, err)
 }

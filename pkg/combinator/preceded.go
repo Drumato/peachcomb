@@ -32,22 +32,14 @@ func Preceded[
 	O1 parser.ParseOutput,
 	O2 parser.ParseOutput,
 ](predecessor parser.Parser[E, O1], successor parser.Parser[E, O2]) parser.Parser[E, O2] {
-	return &precededParser[E, O1, O2]{predecessor, successor}
-}
+	return func(input parser.ParseInput[E]) (parser.ParseInput[E], O2, parser.ParseError) {
+		var o2 O2
+		rest, _, err := predecessor(input)
+		if err != nil {
+			return rest, o2, err
+		}
 
-// precededParser is the actual implementation of Preceded() parser.
-type precededParser[E comparable, O1 parser.ParseOutput, O2 parser.ParseOutput] struct {
-	predecessor parser.Parser[E, O1]
-	successor   parser.Parser[E, O2]
-}
+		return successor(rest)
 
-// Parse implements parser.Parser[E comparable, O parser.ParseOutput] interface.
-func (p *precededParser[E, O1, O2]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], O2, parser.ParseError) {
-	var o2 O2
-	rest, _, err := p.predecessor.Parse(input)
-	if err != nil {
-		return rest, o2, err
 	}
-
-	return p.successor.Parse(rest)
 }

@@ -29,20 +29,14 @@ import (
 
 // Digit1 initializes a parser that follows (0-9)+ syntax rule.
 func Digit1() parser.Parser[rune, string] {
-	return &digit1Parser{}
-}
+	return func(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
+		i, o, err := combinator.Many1(combinator.Satisfy(isDigit))(input)
+		if err != nil {
+			return input, "", err
+		}
 
-// digi!Parser is the actual implementation of Digit1() parser.
-type digit1Parser struct{}
-
-// Parse implements parser.Parser[rune, string] interface.
-func (p *digit1Parser) Parse(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
-	i, o, err := combinator.Many1(combinator.Satisfy(isDigit)).Parse(input)
-	if err != nil {
-		return input, "", err
+		return i, string(o), nil
 	}
-
-	return i, string(o), nil
 }
 
 // isDigit checks the given rune is in the range of unicode digits.

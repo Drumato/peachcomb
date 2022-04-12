@@ -32,22 +32,14 @@ func Terminated[
 	O1 parser.ParseOutput,
 	O2 parser.ParseOutput,
 ](predecessor parser.Parser[E, O1], successor parser.Parser[E, O2]) parser.Parser[E, O1] {
-	return &terminatedParser[E, O1, O2]{predecessor, successor}
-}
+	return func(input parser.ParseInput[E]) (parser.ParseInput[E], O1, parser.ParseError) {
 
-// terminatedParser is the actual implementation of Preceded() parser.
-type terminatedParser[E comparable, O1 parser.ParseOutput, O2 parser.ParseOutput] struct {
-	predecessor parser.Parser[E, O1]
-	successor   parser.Parser[E, O2]
-}
+		rest, o1, err := predecessor(input)
+		if err != nil {
+			return rest, o1, err
+		}
 
-// Parse implements parser.Parser[E comparable, O parser.ParseOutput] interface.
-func (p *terminatedParser[E, O1, O2]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], O1, parser.ParseError) {
-	rest, o1, err := p.predecessor.Parse(input)
-	if err != nil {
+		rest, _, err = successor(rest)
 		return rest, o1, err
 	}
-
-	rest, _, err = p.successor.Parse(rest)
-	return rest, o1, err
 }

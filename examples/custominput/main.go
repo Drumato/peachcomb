@@ -70,7 +70,7 @@ func succeedCase(p parser.Parser[myToken, int]) {
 		{kind: myTokenKindRParen, p: position{line: 1, column: 7}},
 	}
 
-	_, v, err := p.Parse(tokens)
+	_, v, err := p(tokens)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
 		os.Exit(1)
@@ -89,7 +89,7 @@ func failCase(p parser.Parser[myToken, int]) {
 		{kind: myTokenKindInteger, p: position{line: 1, column: 7}, value: 678910},
 	}
 
-	_, _, err := p.Parse(tokens)
+	_, _, err := p(tokens)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
 	}

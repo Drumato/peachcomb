@@ -30,7 +30,7 @@ import (
 const s = `["foo","bar","baz"]`
 
 func main() {
-	_, v, err := jsonArrayParser().Parse([]rune(s))
+	_, v, err := parseJSONValue([]rune(s))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
 		os.Exit(1)

@@ -9,7 +9,7 @@ Go Parser Combinator with Go Generics.
 currently this library is so simple. you only should follow 2 steps as below.
 
 - initializes `parser.Parser[I, O]`
-- call `func (p Parser[I, O]) Parse(input I) (I, O, parser.ParseError)` method
+- call the parser
 
 ## Example
 
@@ -25,7 +25,7 @@ func main() {
 	element := strparse.Digit1()
 	separator := strparse.Rune('|')
 	p := combinator.Separated1(element, separator)
-	i, o, err := p.Parse([]rune("123|456|789Drumato"))
+	i, o, err := p([]rune("123|456|789Drumato"))
 	fmt.Println(i)
 	fmt.Printf("%d\n", o)
 	fmt.Printf("%s %s %s\n", o[0], o[1], o[2])

@@ -35,38 +35,23 @@ func Delimited[
 	contents parser.Parser[E, O2],
 	end parser.Parser[E, O3],
 ) parser.Parser[E, O2] {
-	return &delimitedParser[E, O1, O2, O3]{begin: begin, contents: contents, end: end}
-}
+	return func(input parser.ParseInput[E]) (parser.ParseInput[E], O2, parser.ParseError) {
+		var o2 O2
+		rest, _, err := begin(input)
+		if err != nil {
+			return rest, o2, err
+		}
 
-// delimitedParser is the actual implementation of Delimited parser.
-type delimitedParser[
-	E comparable,
-	O1 parser.ParseOutput,
-	O2 parser.ParseOutput,
-	O3 parser.ParseOutput,
-] struct {
-	begin    parser.Parser[E, O1]
-	contents parser.Parser[E, O2]
-	end      parser.Parser[E, O3]
-}
+		rest, o2, err = contents(rest)
+		if err != nil {
+			return rest, o2, err
+		}
 
-// Parse implements parser.Parser[E comparable, O2 parser.ParseOutput] interface.
-func (p *delimitedParser[E, O1, O2, O3]) Parse(input parser.ParseInput[E]) (parser.ParseInput[E], O2, parser.ParseError) {
-	var o2 O2
-	rest, _, err := p.begin.Parse(input)
-	if err != nil {
-		return rest, o2, err
+		rest, _, err = end(rest)
+		if err != nil {
+			return rest, o2, err
+		}
+
+		return rest, o2, nil
 	}
-
-	rest, o2, err = p.contents.Parse(rest)
-	if err != nil {
-		return rest, o2, err
-	}
-
-	rest, _, err = p.end.Parse(rest)
-	if err != nil {
-		return rest, o2, err
-	}
-
-	return rest, o2, nil
 }

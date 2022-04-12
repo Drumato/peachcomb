@@ -30,7 +30,7 @@ import (
 )
 
 func ExampleUInt8() {
-	i, o, err := byteparse.UInt8().Parse([]byte{0x01, 0x02, 0x03})
+	i, o, err := byteparse.UInt8()([]byte{0x01, 0x02, 0x03})
 	fmt.Println(i)
 	fmt.Println(o)
 	fmt.Println(err)
@@ -42,7 +42,7 @@ func ExampleUInt8() {
 }
 
 func ExampleUInt16() {
-	i, o, err := byteparse.UInt16(binary.BigEndian).Parse([]byte{0x01, 0x02, 0x03})
+	i, o, err := byteparse.UInt16(binary.BigEndian)([]byte{0x01, 0x02, 0x03})
 	fmt.Println(i)
 	fmt.Printf("0x%x\n", o)
 	fmt.Println(err)
@@ -54,7 +54,7 @@ func ExampleUInt16() {
 }
 
 func ExampleUInt32() {
-	i, o, err := byteparse.UInt32(binary.BigEndian).Parse([]byte{0x01, 0x02, 0x03, 0x04})
+	i, o, err := byteparse.UInt32(binary.BigEndian)([]byte{0x01, 0x02, 0x03, 0x04})
 	fmt.Println(i)
 	fmt.Printf("0x%x\n", o)
 	fmt.Println(err)
