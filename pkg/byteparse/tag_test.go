@@ -23,59 +23,20 @@
 package byteparse_test
 
 import (
-	"encoding/binary"
-	"fmt"
+	"testing"
 
 	"github.com/Drumato/peachcomb/pkg/byteparse"
+	"github.com/stretchr/testify/assert"
 )
 
-func ExampleUInt8() {
-	i, o, err := byteparse.UInt8()([]byte{0x01, 0x02, 0x03})
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	//
-	// [2 3]
-	// 1
-	// <nil>
+func TestTagFailureWithShorterInput(t *testing.T) {
+	p := byteparse.Tag([]byte("Golang"))
+	_, _, err := p([]byte("Go"))
+	assert.Error(t, err)
 }
 
-func ExampleUInt16() {
-	i, o, err := byteparse.UInt16(binary.BigEndian)([]byte{0x01, 0x02, 0x03})
-	fmt.Println(i)
-	fmt.Printf("0x%x\n", o)
-	fmt.Println(err)
-	// Output:
-	//
-	// [3]
-	// 0x102
-	// <nil>
-}
-
-func ExampleUInt32() {
-	i, o, err := byteparse.UInt32(binary.BigEndian)([]byte{0x01, 0x02, 0x03, 0x04})
-	fmt.Println(i)
-	fmt.Printf("0x%x\n", o)
-	fmt.Println(err)
-	// Output:
-	//
-	// []
-	// 0x1020304
-	// <nil>
-}
-
-func ExampleTag() {
-	t := []byte{0x7f, 0x45, 0x4c, 0x46}
-
-	i, o, err := byteparse.Tag(t)([]byte{0x7f, 0x45, 0x4c, 0x46, 0x02})
-	fmt.Println(i)
-	fmt.Printf("%d\n", len(o))
-	fmt.Printf("%x %x %x %x\n", o[0], o[1], o[2], o[3])
-	fmt.Println(err)
-	// Output:
-	// [2]
-	// 4
-	// 7f 45 4c 46
-	// <nil>
+func TestTagFailure(t *testing.T) {
+	p := byteparse.Tag([]byte("Clang"))
+	_, _, err := p([]byte("Dlang"))
+	assert.Error(t, err)
 }

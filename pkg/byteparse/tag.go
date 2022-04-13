@@ -20,62 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package byteparse_test
+package byteparse
 
 import (
-	"encoding/binary"
+	"bytes"
 	"fmt"
 
-	"github.com/Drumato/peachcomb/pkg/byteparse"
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-func ExampleUInt8() {
-	i, o, err := byteparse.UInt8()([]byte{0x01, 0x02, 0x03})
-	fmt.Println(i)
-	fmt.Println(o)
-	fmt.Println(err)
-	// Output:
-	//
-	// [2 3]
-	// 1
-	// <nil>
+// Tag initializes a parser that checks the input starts with the tag prefix.
+func Tag(tag []byte) parser.Parser[byte, []byte] {
+	return func(input parser.ParseInput[byte]) (parser.ParseInput[byte], []byte, parser.ParseError) {
+		if len(input) < len(tag) {
+			return input, nil, &parser.NoLeftInputToParseError{}
+		}
+
+		unmatched := !bytes.HasPrefix(input, tag)
+		if unmatched {
+			return input, nil, &UnexpectedPrefixError{expected: tag}
+		}
+		return input[len(tag):], tag, nil
+	}
 }
 
-func ExampleUInt16() {
-	i, o, err := byteparse.UInt16(binary.BigEndian)([]byte{0x01, 0x02, 0x03})
-	fmt.Println(i)
-	fmt.Printf("0x%x\n", o)
-	fmt.Println(err)
-	// Output:
-	//
-	// [3]
-	// 0x102
-	// <nil>
+// UnexpectedPrefixError notifies the prefix of the given input is unexpected.
+type UnexpectedPrefixError struct {
+	expected []byte
 }
 
-func ExampleUInt32() {
-	i, o, err := byteparse.UInt32(binary.BigEndian)([]byte{0x01, 0x02, 0x03, 0x04})
-	fmt.Println(i)
-	fmt.Printf("0x%x\n", o)
-	fmt.Println(err)
-	// Output:
-	//
-	// []
-	// 0x1020304
-	// <nil>
-}
-
-func ExampleTag() {
-	t := []byte{0x7f, 0x45, 0x4c, 0x46}
-
-	i, o, err := byteparse.Tag(t)([]byte{0x7f, 0x45, 0x4c, 0x46, 0x02})
-	fmt.Println(i)
-	fmt.Printf("%d\n", len(o))
-	fmt.Printf("%x %x %x %x\n", o[0], o[1], o[2], o[3])
-	fmt.Println(err)
-	// Output:
-	// [2]
-	// 4
-	// 7f 45 4c 46
-	// <nil>
+// Error implements error interface.
+func (e *UnexpectedPrefixError) Error() string {
+	return fmt.Sprintf("expected \"%s\" prefix", e.expected)
 }
