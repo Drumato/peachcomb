@@ -49,12 +49,12 @@ func many[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], min uin
 
 		count := 0
 		output := make([]SO, 0)
-		var rest parser.ParseInput[E]
-		for count < len(input) {
+		rest := input
+		for {
 			var o SO
 			var err error
 
-			rest, o, err = sub(input[count:])
+			rest, o, err = sub(rest)
 			if err != nil {
 				break
 			}
