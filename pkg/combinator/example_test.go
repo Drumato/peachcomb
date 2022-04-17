@@ -162,6 +162,19 @@ func ExampleMany1() {
 	// <nil>
 }
 
+func ExampleManyMinMax() {
+	p := combinator.ManyMinMax(strparse.Rune('a'), 3, 5)
+
+	i, o, err := p([]rune("aaaabbb"))
+	fmt.Println(string(i))
+	fmt.Println(string(o))
+	fmt.Println(err)
+	// Output:
+	// bbb
+	// aaaa
+	// <nil>
+}
+
 func ExampleBranches() {
 	m := make(map[byte]parser.Parser[byte, string])
 	m[0x00] = combinator.Map(byteparse.UInt8(), func(v uint8) (string, error) { return "0x00", nil })

@@ -26,20 +26,15 @@ import (
 	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-// Many0 initializes a parser that applies the given sub-parser several times.
-func Many0[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO]) parser.Parser[E, []SO] {
-	return many(sub, 0)
+// ManyMinMax initializes a parser that applies the given sub-parser several times.
+// It fails if the sub parser does not succeed at least min times.
+// It also fails if the sub parser does succeed over max times.
+func ManyMinMax[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], min uint, max uint) parser.Parser[E, []SO] {
+	return manyMinMax(sub, min, max)
 }
 
-// Many1 initializes a parser that applies the given sub-parser several times.
-// if the sub parser fails to parse and the count of application times is 0
-// Many11 parser return an error.
-func Many1[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO]) parser.Parser[E, []SO] {
-	return many(sub, 1)
-}
-
-// many is the actual implementation of Many0/1.
-func many[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], min uint) parser.Parser[E, []SO] {
+// manyMinMax is the actual implementation of ManyMinMax.
+func manyMinMax[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], min uint, max uint) parser.Parser[E, []SO] {
 	return func(input parser.ParseInput[E]) (parser.ParseInput[E], []SO, parser.ParseError) {
 		if len(input) == 0 {
 			return input, nil, &parser.NoLeftInputToParseError{}
@@ -51,6 +46,10 @@ func many[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], min uin
 		for {
 			var o SO
 			var err error
+
+			if count >= int(max) {
+				return rest, output, &NotSatisfiedCountError{}
+			}
 
 			rest, o, err = sub(rest)
 			if err != nil {
@@ -68,13 +67,4 @@ func many[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], min uin
 		return rest, output, nil
 
 	}
-}
-
-// NotSatisfiedCountError notifies the count of sub-parser success are not satisfied.
-type NotSatisfiedCountError struct {
-}
-
-// Error implements error interface.
-func (e *NotSatisfiedCountError) Error() string {
-	return "not satisfied the range of sub-parser succeeds"
 }
