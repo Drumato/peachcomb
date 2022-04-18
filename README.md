@@ -27,7 +27,7 @@ func main() {
 	p := combinator.Separated1(element, separator)
 	i, o, err := p([]rune("123|456|789Drumato"))
 	fmt.Println(i)
-	fmt.Printf("%d\n", o)
+	fmt.Printf("%d\n", len(o))
 	fmt.Printf("%s %s %s\n", o[0], o[1], o[2])
 	fmt.Println(err)
 }
@@ -36,7 +36,7 @@ func main() {
 ```shell
 $ go run main.go
 Drumato
-123 456 789
 3
+123 456 789
 <nil>
 ```
