@@ -36,7 +36,8 @@ func TestDelimitedBeginFailure(t *testing.T) {
 	end := strparse.Rune('"')
 
 	p := combinator.Delimited(begin, contents, end)
-	_, _, err := p([]rune("'12345\""))
+	i := strparse.NewCompleteInput("'12345\"")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }
 
@@ -46,7 +47,8 @@ func TestDelimitedContentsFailure(t *testing.T) {
 	end := strparse.Rune('"')
 
 	p := combinator.Delimited(begin, contents, end)
-	_, _, err := p([]rune("\"abcde\""))
+	i := strparse.NewCompleteInput("\"abcde\"")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }
 
@@ -56,6 +58,7 @@ func TestDelimitedEndFailure(t *testing.T) {
 	end := strparse.Rune('"')
 
 	p := combinator.Delimited(begin, contents, end)
-	_, _, err := p([]rune("\"12345'"))
+	i := strparse.NewCompleteInput("\"12345'")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }

@@ -35,8 +35,9 @@ func TestBranchesFailure(t *testing.T) {
 	m := make(map[byte]parser.Parser[byte, uint])
 	m[0x00] = combinator.Map(byteparse.UInt8(), func(v uint8) (uint, error) { return uint(v), nil })
 	m[0x01] = combinator.Map(byteparse.UInt8(), func(v uint8) (uint, error) { return uint(v), nil })
-
 	p := combinator.Branches(m)
-	_, _, err := p([]byte{0x02})
+
+	i := byteparse.NewCompleteInput([]byte{0x02})
+	_, _, err := p(i)
 	assert.Error(t, err)
 }

@@ -25,12 +25,13 @@ package main
 import (
 	"testing"
 
+	"github.com/Drumato/peachcomb/pkg/byteparse"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestParseJSONNumberValue(t *testing.T) {
-	i, o, err := parseJSONNumberValue([]rune("12345"))
+	i := byteparse.NewCompleteInput([]byte("12345"))
+	_, o, err := parseJSONNumberValue(i)
 	assert.NoError(t, err)
 	assert.Equal(t, jsonValueInteger(12345), o)
-	assert.Equal(t, "", string(i))
 }

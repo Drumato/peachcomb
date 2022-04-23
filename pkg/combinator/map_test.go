@@ -35,7 +35,8 @@ func TestMapSubParserFailure(t *testing.T) {
 	subP := strparse.Rune('a')
 	p := combinator.Map(subP, func(ch rune) (bool, error) { return ch == 'a', nil })
 
-	_, _, err := p([]rune("bc"))
+	i := strparse.NewCompleteInput("bc")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }
 
@@ -43,6 +44,7 @@ func TestMapFnFailure(t *testing.T) {
 	subP := strparse.Rune('a')
 	p := combinator.Map(subP, func(ch rune) (bool, error) { return false, fmt.Errorf("") })
 
-	_, _, err := p([]rune("a"))
+	i := strparse.NewCompleteInput("a")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }

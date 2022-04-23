@@ -37,14 +37,26 @@ import (
 func Branches[E comparable, O parser.ParseOutput](rules map[E]parser.Parser[E, O]) parser.Parser[E, O] {
 	return func(input parser.ParseInput[E]) (parser.ParseInput[E], O, parser.ParseError) {
 		var o O
-		if len(input) == 0 {
+
+		storedOffset, err := input.Seek(0, parser.SeekModeCurrent)
+		if err != nil {
+			return input, o, err
+		}
+
+		buf := make([]E, 1)
+		n, err := input.Read(buf)
+		if err != nil || n < 1 {
+			return input, o, err
+		}
+
+		sub, ok := rules[buf[0]]
+		if !ok {
 			return input, o, &parser.NoLeftInputToParseError{}
 		}
 
-		e := input[0]
-		sub, ok := rules[e]
-		if !ok {
-			return input, o, &parser.NoLeftInputToParseError{}
+		_, err = input.Seek(storedOffset, parser.SeekModeStart)
+		if err != nil {
+			return input, o, err
 		}
 
 		return sub(input)

@@ -26,12 +26,15 @@ import (
 	"testing"
 
 	"github.com/Drumato/peachcomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSatisfyFailure(t *testing.T) {
 	p := combinator.Satisfy(func(ch rune) bool { return ch == 'a' })
-	_, _, err := p([]rune("bbc"))
+
+	i := strparse.NewCompleteInput("bbc")
+	_, _, err := p(i)
 
 	assert.Error(t, err)
 }

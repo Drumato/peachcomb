@@ -29,11 +29,14 @@ import (
 // Uint8 initializes a parser that parse 8-bit unsigned integer.
 func UInt8() parser.Parser[byte, uint8] {
 	return func(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint8, parser.ParseError) {
-		if len(input) == 0 {
-			return nil, 0, &parser.NoLeftInputToParseError{}
+		buf := make([]byte, 1)
+
+		n, err := input.Read(buf)
+		if err != nil || n < 1 {
+			return input, 0, &parser.NoLeftInputToParseError{}
 		}
 
-		head := input[0]
-		return input[1:], head, nil
+		v := buf[0]
+		return input, v, nil
 	}
 }

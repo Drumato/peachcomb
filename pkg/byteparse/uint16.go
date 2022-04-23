@@ -32,11 +32,14 @@ import (
 // user can determine the behavior of this parser by giving byteorder what you want to use.
 func UInt16(byteorder binary.ByteOrder) parser.Parser[byte, uint16] {
 	return func(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint16, parser.ParseError) {
-		if len(input) < 2 {
-			return nil, 0, &parser.NoLeftInputToParseError{}
+		buf := make([]byte, 2)
+
+		n, err := input.Read(buf)
+		if err != nil || n < 2 {
+			return input, 0, &parser.NoLeftInputToParseError{}
 		}
 
-		v := byteorder.Uint16(input)
-		return input[2:], v, nil
+		v := byteorder.Uint16(buf)
+		return input, v, nil
 	}
 }

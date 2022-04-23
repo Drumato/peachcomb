@@ -31,7 +31,7 @@ import (
 )
 
 func TestUInt64Failure(t *testing.T) {
-	i := []byte{}
+	i := byteparse.NewCompleteInput([]byte{})
 	p := byteparse.UInt64(binary.BigEndian)
 	_, _, err := p(i)
 	assert.Error(t, err)

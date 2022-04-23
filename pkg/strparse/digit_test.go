@@ -31,6 +31,8 @@ import (
 
 func TestDigit1Failure(t *testing.T) {
 	p := strparse.Digit1()
-	_, _, err := p([]rune("aabbccdd11223344"))
+
+	i := strparse.NewCompleteInput("aabbccdd11223344")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }

@@ -20,39 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package byteparse
+package strparse
 
 import (
-	"bytes"
-	"fmt"
-
 	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-// Tag initializes a parser that checks the input starts with the tag prefix.
-func Tag(tag []byte) parser.Parser[byte, []byte] {
-	return func(input parser.ParseInput[byte]) (parser.ParseInput[byte], []byte, parser.ParseError) {
-		buf := make([]byte, len(tag))
+// Complete
+type CompleteInput struct {
+	runes  []rune
+	offset int
+}
 
-		n, err := input.Read(buf)
-		if err != nil || n < len(tag) {
-			return input, nil, &parser.NoLeftInputToParseError{}
-		}
+func NewCompleteInput(s string) *CompleteInput {
+	return &CompleteInput{runes: []rune(s)}
+}
 
-		unmatched := !bytes.HasPrefix(buf, tag)
-		if unmatched {
-			return input, nil, &UnexpectedPrefixError{expected: tag}
-		}
-		return input, tag, nil
+func (c *CompleteInput) Read(buf []rune) (int, error) {
+	if c.offset >= len(c.runes) {
+		return 0, &parser.NoLeftInputToParseError{}
 	}
+
+	copy(buf, c.runes[c.offset:])
+	c.offset += len(buf)
+
+	return len(buf), nil
 }
 
-// UnexpectedPrefixError notifies the prefix of the given input is unexpected.
-type UnexpectedPrefixError struct {
-	expected []byte
-}
+func (c *CompleteInput) Seek(n int, mode parser.SeekMode) (int, error) {
+	switch mode {
+	case parser.SeekModeStart:
+		if n >= len(c.runes) {
+			return 0, &parser.NoLeftInputToParseError{}
+		}
 
-// Error implements error interface.
-func (e *UnexpectedPrefixError) Error() string {
-	return fmt.Sprintf("expected \"%s\" prefix", e.expected)
+		c.offset = n
+		return c.offset, nil
+	case parser.SeekModeCurrent:
+		if c.offset+n >= len(c.runes) {
+			return 0, &parser.NoLeftInputToParseError{}
+		}
+
+		c.offset += n
+		return c.offset, nil
+	default:
+		panic("given seek mode is not supported")
+	}
 }

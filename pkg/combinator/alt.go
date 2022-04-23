@@ -36,8 +36,17 @@ func Alt[E comparable, O parser.ParseOutput](parsers ...parser.Parser[E, O]) par
 		for _, subP := range parsers {
 			var err parser.ParseError
 
+			storedOffset, err := input.Seek(0, parser.SeekModeCurrent)
+			if err != nil {
+				return subI, subO, nil
+			}
 			subI, subO, err = subP(input)
 			if err == nil {
+				return subI, subO, nil
+			}
+
+			_, err = input.Seek(storedOffset, parser.SeekModeStart)
+			if err != nil {
 				return subI, subO, nil
 			}
 		}

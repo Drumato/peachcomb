@@ -30,7 +30,7 @@ import (
 type jsonValue interface {
 }
 
-func parseJSONValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
+func parseJSONValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
 	begin := parseJSONWhitespace
 	contents := combinator.Alt(parseJSONStringValue, parseJSONNumberValue, parseJSONArrayValue)
 	end := parseJSONWhitespace

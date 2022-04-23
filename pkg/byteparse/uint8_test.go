@@ -30,7 +30,7 @@ import (
 )
 
 func TestUInt8Failure(t *testing.T) {
-	i := []byte{}
+	i := byteparse.NewCompleteInput([]byte{})
 	p := byteparse.UInt8()
 	_, _, err := p(i)
 	assert.Error(t, err)

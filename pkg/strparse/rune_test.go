@@ -31,16 +31,17 @@ import (
 
 func TestRuneFailure(t *testing.T) {
 	p := strparse.Rune('a')
-	_, _, err := p([]rune("bbc"))
+
+	i := strparse.NewCompleteInput("bbc")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }
 
 func TestRuneOnMuitiBytes(t *testing.T) {
 	p := strparse.Rune('あ')
-	i, o, err := p([]rune("あいう"))
+
+	i := strparse.NewCompleteInput("あいう")
+	_, o, err := p(i)
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(i))
-	assert.Equal(t, 'い', i[0])
-	assert.Equal(t, 'う', i[1])
 	assert.Equal(t, 'あ', o)
 }

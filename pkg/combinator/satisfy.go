@@ -32,17 +32,25 @@ import (
 func Satisfy[E comparable](pred Predicate[E]) parser.Parser[E, E] {
 	return func(input parser.ParseInput[E]) (parser.ParseInput[E], E, parser.ParseError) {
 		var e E
-		if len(input) == 0 {
+
+		storedOffset, err := input.Seek(0, parser.SeekModeCurrent)
+		if err != nil {
+			return input, e, err
+		}
+
+		buf := make([]E, 1)
+		n, err := input.Read(buf)
+		if err != nil || n < 1 {
 			return input, e, &parser.NoLeftInputToParseError{}
 		}
 
-		e = input[0]
-		notSatisfied := !pred(e)
+		notSatisfied := !pred(buf[0])
 		if notSatisfied {
+			input.Seek(storedOffset, parser.SeekModeStart)
 			return input, e, &NotSatisfiedError[E]{actual: e}
 		}
 
-		return input[1:], e, nil
+		return input, buf[0], nil
 	}
 }
 

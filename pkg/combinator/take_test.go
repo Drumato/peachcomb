@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/Drumato/peachcomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,6 +36,7 @@ func TestTakeFailure(t *testing.T) {
 	})
 	p := combinator.Take(5, subP)
 
-	_, _, err := p([]rune("aaaab"))
+	i := strparse.NewCompleteInput("aaaab")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }

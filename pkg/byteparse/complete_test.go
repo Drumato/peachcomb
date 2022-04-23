@@ -23,36 +23,48 @@
 package byteparse
 
 import (
-	"bytes"
-	"fmt"
+	"testing"
 
 	"github.com/Drumato/peachcomb/pkg/parser"
+	"github.com/stretchr/testify/assert"
 )
 
-// Tag initializes a parser that checks the input starts with the tag prefix.
-func Tag(tag []byte) parser.Parser[byte, []byte] {
-	return func(input parser.ParseInput[byte]) (parser.ParseInput[byte], []byte, parser.ParseError) {
-		buf := make([]byte, len(tag))
+func TestRead(t *testing.T) {
+	b := []byte{1, 2}
+	i := NewCompleteInput(b)
 
-		n, err := input.Read(buf)
-		if err != nil || n < len(tag) {
-			return input, nil, &parser.NoLeftInputToParseError{}
-		}
+	buf := make([]byte, 1)
+	n, err := i.Read(buf)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, byte(1), buf[0])
 
-		unmatched := !bytes.HasPrefix(buf, tag)
-		if unmatched {
-			return input, nil, &UnexpectedPrefixError{expected: tag}
-		}
-		return input, tag, nil
-	}
+	n, err = i.Read(buf)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, byte(2), buf[0])
+
+	n, err = i.Read(buf)
+	assert.Error(t, err)
+	assert.Equal(t, 0, n)
 }
 
-// UnexpectedPrefixError notifies the prefix of the given input is unexpected.
-type UnexpectedPrefixError struct {
-	expected []byte
-}
+func TestSeek(t *testing.T) {
+	b := []byte{1, 2}
+	i := NewCompleteInput(b)
 
-// Error implements error interface.
-func (e *UnexpectedPrefixError) Error() string {
-	return fmt.Sprintf("expected \"%s\" prefix", e.expected)
+	buf := make([]byte, 1)
+	n, err := i.Read(buf)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, byte(1), buf[0])
+
+	n, err = i.Seek(0, parser.SeekModeStart)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, n)
+
+	n, err = i.Read(buf)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, byte(1), buf[0])
 }

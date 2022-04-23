@@ -54,6 +54,43 @@ type position struct {
 	column uint
 }
 
+type pseudoTokenStream struct {
+	tokens []myToken
+	offset int
+}
+
+func (c *pseudoTokenStream) Read(buf []myToken) (int, error) {
+	if c.offset >= len(c.tokens) {
+		return 0, &parser.NoLeftInputToParseError{}
+	}
+
+	copy(buf, c.tokens[c.offset:])
+	c.offset += len(buf)
+
+	return len(buf), nil
+}
+
+func (c *pseudoTokenStream) Seek(n int, mode parser.SeekMode) (int, error) {
+	switch mode {
+	case parser.SeekModeStart:
+		if n >= len(c.tokens) {
+			return 0, &parser.NoLeftInputToParseError{}
+		}
+
+		c.offset = n
+		return c.offset, nil
+	case parser.SeekModeCurrent:
+		if c.offset+n >= len(c.tokens) {
+			return 0, &parser.NoLeftInputToParseError{}
+		}
+
+		c.offset += n
+		return c.offset, nil
+	default:
+		panic("given seek mode is not supported")
+	}
+}
+
 func main() {
 	p := setupParser()
 	succeedCase(p)
@@ -69,8 +106,9 @@ func succeedCase(p parser.Parser[myToken, int]) {
 		// ")"
 		{kind: myTokenKindRParen, p: position{line: 1, column: 7}},
 	}
+	s := &pseudoTokenStream{tokens: tokens}
 
-	_, v, err := p(tokens)
+	_, v, err := p(s)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
 		os.Exit(1)
@@ -88,8 +126,9 @@ func failCase(p parser.Parser[myToken, int]) {
 		// 678910
 		{kind: myTokenKindInteger, p: position{line: 1, column: 7}, value: 678910},
 	}
+	s := &pseudoTokenStream{tokens: tokens}
 
-	_, _, err := p(tokens)
+	_, _, err := p(s)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
 	}

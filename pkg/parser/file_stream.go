@@ -20,39 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package byteparse
+package parser
 
 import (
-	"bytes"
-	"fmt"
-
-	"github.com/Drumato/peachcomb/pkg/parser"
+	"io"
 )
 
-// Tag initializes a parser that checks the input starts with the tag prefix.
-func Tag(tag []byte) parser.Parser[byte, []byte] {
-	return func(input parser.ParseInput[byte]) (parser.ParseInput[byte], []byte, parser.ParseError) {
-		buf := make([]byte, len(tag))
-
-		n, err := input.Read(buf)
-		if err != nil || n < len(tag) {
-			return input, nil, &parser.NoLeftInputToParseError{}
-		}
-
-		unmatched := !bytes.HasPrefix(buf, tag)
-		if unmatched {
-			return input, nil, &UnexpectedPrefixError{expected: tag}
-		}
-		return input, tag, nil
-	}
+type IOReadSeeker struct {
+	r io.ReadSeeker
 }
 
-// UnexpectedPrefixError notifies the prefix of the given input is unexpected.
-type UnexpectedPrefixError struct {
-	expected []byte
+func NewIOReadSeeker(r io.ReadSeeker) *IOReadSeeker {
+	return &IOReadSeeker{r}
 }
 
-// Error implements error interface.
-func (e *UnexpectedPrefixError) Error() string {
-	return fmt.Sprintf("expected \"%s\" prefix", e.expected)
+func (r *IOReadSeeker) Read(buf []byte) (int, error) {
+	return r.r.Read(buf)
+}
+
+func (r *IOReadSeeker) Seek(n int, mode SeekMode) (int, error) {
+	v, err := r.r.Seek(int64(n), int(mode))
+	return int(v), err
 }

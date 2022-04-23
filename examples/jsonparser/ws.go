@@ -27,8 +27,8 @@ import (
 	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-func parseJSONWhitespace(input parser.ParseInput[rune]) (parser.ParseInput[rune], []rune, parser.ParseError) {
-	p := combinator.Many0(combinator.Satisfy(func(ch rune) bool {
+func parseJSONWhitespace(input parser.ParseInput[byte]) (parser.ParseInput[byte], []byte, parser.ParseError) {
+	p := combinator.Many0(combinator.Satisfy(func(ch byte) bool {
 		return ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t'
 	}))
 	return p(input)

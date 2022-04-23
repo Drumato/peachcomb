@@ -25,12 +25,27 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
 const s = `["foo","bar","baz"]`
 
 func main() {
-	_, v, err := parseJSONValue([]rune(s))
+	args := os.Args
+	if len(args) != 2 {
+		fmt.Fprintln(os.Stderr, "usage: ./jsonparser <json-file>")
+		os.Exit(1)
+	}
+
+	f, err := os.Open(args[1])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
+		os.Exit(1)
+	}
+
+	r := parser.NewIOReadSeeker(f)
+	_, v, err := parseJSONValue(r)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %+v\n", err)
 		os.Exit(1)

@@ -36,22 +36,17 @@ func ManyMinMax[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], m
 // manyMinMax is the actual implementation of ManyMinMax.
 func manyMinMax[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], min uint, max uint) parser.Parser[E, []SO] {
 	return func(input parser.ParseInput[E]) (parser.ParseInput[E], []SO, parser.ParseError) {
-		if len(input) == 0 {
-			return input, nil, &parser.NoLeftInputToParseError{}
-		}
-
 		count := 0
 		output := make([]SO, 0)
-		rest := input
 		for {
 			var o SO
 			var err error
 
 			if count >= int(max) {
-				return rest, output, &NotSatisfiedCountError{}
+				return input, output, &NotSatisfiedCountError{}
 			}
 
-			rest, o, err = sub(rest)
+			input, o, err = sub(input)
 			if err != nil {
 				break
 			}
@@ -61,10 +56,10 @@ func manyMinMax[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], m
 		}
 
 		if count < int(min) {
-			return rest, output, &NotSatisfiedCountError{}
+			return input, output, &NotSatisfiedCountError{}
 		}
 
-		return rest, output, nil
+		return input, output, nil
 
 	}
 }

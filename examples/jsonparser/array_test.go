@@ -25,6 +25,7 @@ package main
 import (
 	"testing"
 
+	"github.com/Drumato/peachcomb/pkg/byteparse"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -37,14 +38,15 @@ func TestParseJSONArrayValue(t *testing.T) {
 		},
 		length: 3,
 	}
-	i, o, err := parseJSONArrayValue([]rune(`["foo", "bar", "baz"]`))
+
+	i := byteparse.NewCompleteInput([]byte(`["foo", "bar", "baz"]`))
+	_, o, err := parseJSONArrayValue(i)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, o)
-	assert.Equal(t, "", string(i))
 }
 
 func TestParseJSONArrayValueWith2d(t *testing.T) {
-	s := []rune(`[["a", "b"], ["c", "d"], ["e", "f"]]`)
+	i := byteparse.NewCompleteInput([]byte(`[["a", "b"], ["c", "d"], ["e", "f"]]`))
 	expected := jsonArrayValue{
 		elements: []jsonValue{
 			jsonArrayValue{
@@ -71,8 +73,7 @@ func TestParseJSONArrayValueWith2d(t *testing.T) {
 		},
 		length: 3,
 	}
-	i, o, err := parseJSONArrayValue(s)
+	_, o, err := parseJSONArrayValue(i)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, o)
-	assert.Equal(t, "", string(i))
 }

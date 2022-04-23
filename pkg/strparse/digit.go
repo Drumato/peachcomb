@@ -32,7 +32,7 @@ func Digit1() parser.Parser[rune, string] {
 	return func(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
 		i, o, err := combinator.Many1(combinator.Satisfy(isDigit))(input)
 		if err != nil {
-			return input, "", err
+			return i, "", err
 		}
 
 		return i, string(o), nil

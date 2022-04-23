@@ -35,7 +35,8 @@ func TestPrecededPredecessorFailure(t *testing.T) {
 	successor := strparse.Rune('a')
 	p := combinator.Preceded(predecessor, successor)
 
-	_, _, err := p([]rune("/a"))
+	i := strparse.NewCompleteInput("/a")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }
 
@@ -44,6 +45,7 @@ func TestPrecededSuccessorFailure(t *testing.T) {
 	successor := strparse.Rune('a')
 	p := combinator.Preceded(predecessor, successor)
 
-	_, _, err := p([]rune("*b"))
+	i := strparse.NewCompleteInput("*b")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }

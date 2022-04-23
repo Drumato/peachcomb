@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/Drumato/peachcomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,9 +34,12 @@ func TestManyMinMaxFailure(t *testing.T) {
 	subP := combinator.Satisfy(func(ch rune) bool {
 		return ch == 'a'
 	})
-	_, _, err := combinator.ManyMinMax(subP, 3, 5)([]rune("aabbb"))
+
+	i := strparse.NewCompleteInput("aabbb")
+	_, _, err := combinator.ManyMinMax(subP, 3, 5)(i)
 	assert.Error(t, err)
 
-	_, _, err = combinator.ManyMinMax(subP, 3, 5)([]rune("aaaaaabb"))
+	i = strparse.NewCompleteInput("aaaaaabbb")
+	_, _, err = combinator.ManyMinMax(subP, 3, 5)(i)
 	assert.Error(t, err)
 }
