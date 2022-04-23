@@ -4,6 +4,19 @@
 
 Go Parser Combinator with Go Generics.  
 
+## Roadmap
+
+- [x] stream input type
+- [x] complete input type
+- [x] custom input types
+- [x] combinator
+- [x] string parser
+- [x] bytes parser
+- [ ] examples
+  - [ ] JSON parser
+  - [ ] HTTP parser
+  - [ ] tiny tree-walked interpreter
+
 ## How to use
 
 currently this library is so simple. you only should follow 2 steps as below.
