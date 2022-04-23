@@ -31,12 +31,16 @@ import (
 
 func TestTagFailureWithShorterInput(t *testing.T) {
 	p := byteparse.Tag([]byte("Golang"))
-	_, _, err := p([]byte("Go"))
+
+	b := byteparse.NewCompleteInput([]byte("Go"))
+	_, _, err := p(b)
 	assert.Error(t, err)
 }
 
 func TestTagFailure(t *testing.T) {
 	p := byteparse.Tag([]byte("Clang"))
-	_, _, err := p([]byte("Dlang"))
+
+	b := byteparse.NewCompleteInput([]byte("Dlang"))
+	_, _, err := p(b)
 	assert.Error(t, err)
 }

@@ -32,16 +32,19 @@ import (
 func Tag(tag string) parser.Parser[rune, string] {
 	return func(input parser.ParseInput[rune]) (parser.ParseInput[rune], string, parser.ParseError) {
 		t := []rune(tag)
-		if len(input) < len(t) {
+		buf := make([]rune, len(tag))
+
+		n, err := input.Read(buf)
+		if err != nil || n < len(tag) {
 			return input, "", &parser.NoLeftInputToParseError{}
 		}
 
-		unmatched := !hasPrefix(input, t)
+		unmatched := !hasPrefix(buf, t)
 		if unmatched {
 			return input, "", &UnexpectedPrefixError{expected: tag}
 		}
 
-		return input[len(t):], tag, nil
+		return input, tag, nil
 	}
 }
 

@@ -29,24 +29,19 @@ import (
 // Take initializes a parser that applies sub-parser count times.
 func Take[E comparable, SO parser.ParseOutput](count uint, sub parser.Parser[E, SO]) parser.Parser[E, []SO] {
 	return func(input parser.ParseInput[E]) (parser.ParseInput[E], []SO, parser.ParseError) {
-		if len(input) == 0 {
-			return input, nil, &parser.NoLeftInputToParseError{}
-		}
-
 		output := make([]SO, count)
-		rest := input
 
 		var o SO
 		var err error
 		for i := uint(0); i < count; i++ {
-			rest, o, err = sub(rest)
+			input, o, err = sub(input)
 			if err != nil {
-				return rest, output, err
+				return input, output, err
 			}
 
 			output[i] = o
 		}
 
-		return rest, output, nil
+		return input, output, nil
 	}
 }

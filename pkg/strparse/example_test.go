@@ -29,37 +29,34 @@ import (
 )
 
 func ExampleRune() {
-	i, o, err := strparse.Rune('a')([]rune("abc"))
-	fmt.Println(string(i))
+	i := strparse.NewCompleteInput("abc")
+	_, o, err := strparse.Rune('a')(i)
 	fmt.Printf("%c\n", o)
 	fmt.Println(err)
 	// Output:
 	//
-	// bc
 	// a
 	// <nil>
 }
 
 func ExampleTag() {
-	i, o, err := strparse.Tag("Drum")([]rune("Drumato"))
-	fmt.Println(string(i))
+	i := strparse.NewCompleteInput("Drumato")
+	_, o, err := strparse.Tag("Drum")(i)
 	fmt.Println(o)
 	fmt.Println(err)
 	// Output:
 	//
-	// ato
 	// Drum
 	// <nil>
 }
 
 func ExampleDigit1() {
-	i, o, err := strparse.Digit1()([]rune("112233abc"))
-	fmt.Println(string(i))
+	i := strparse.NewCompleteInput("112233abc")
+	_, o, err := strparse.Digit1()(i)
 	fmt.Println(o)
 	fmt.Println(err)
 	// Output:
 	//
-	// abc
 	// 112233
 	// <nil>
 }

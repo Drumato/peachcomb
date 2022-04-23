@@ -25,16 +25,16 @@ package main
 import (
 	"github.com/Drumato/peachcomb/pkg/combinator"
 	"github.com/Drumato/peachcomb/pkg/parser"
-	"github.com/Drumato/peachcomb/pkg/strparse"
 )
 
 type jsonValueString string
 
-func parseJSONStringValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
-	begin := strparse.Rune('"')
-	contents := combinator.Many0(combinator.Satisfy(func(ch rune) bool { return ch != '"' }))
-	end := strparse.Rune('"')
-	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s []rune) (jsonValue, error) {
+func parseJSONStringValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
+	begin := combinator.Satisfy(func(ch byte) bool { return ch == '"' })
+	contents := combinator.Many0(combinator.Satisfy(func(ch byte) bool { return ch != '"' }))
+	end := combinator.Satisfy(func(ch byte) bool { return ch == '"' })
+
+	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s []byte) (jsonValue, error) {
 		return jsonValueString(s), nil
 	})
 

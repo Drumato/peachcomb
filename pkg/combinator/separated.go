@@ -22,11 +22,12 @@
 
 package combinator
 
-import "github.com/Drumato/peachcomb/pkg/parser"
+import (
+	"github.com/Drumato/peachcomb/pkg/parser"
+)
 
 func Separated1[E comparable, EO parser.ParseOutput, SO parser.ParseOutput](element parser.Parser[E, EO], separator parser.Parser[E, SO]) parser.Parser[E, []EO] {
 	return func(input parser.ParseInput[E]) (parser.ParseInput[E], []EO, parser.ParseError) {
-
 		output := make([]EO, 0)
 		rest, e1, err := element(input)
 		if err != nil {

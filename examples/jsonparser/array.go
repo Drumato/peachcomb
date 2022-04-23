@@ -25,7 +25,6 @@ package main
 import (
 	"github.com/Drumato/peachcomb/pkg/combinator"
 	"github.com/Drumato/peachcomb/pkg/parser"
-	"github.com/Drumato/peachcomb/pkg/strparse"
 )
 
 type jsonArrayValue struct {
@@ -33,10 +32,16 @@ type jsonArrayValue struct {
 	length   int
 }
 
-func parseJSONArrayValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
-	begin := strparse.Rune('[')
-	end := strparse.Rune(']')
-	separator := strparse.Rune(',')
+func parseJSONArrayValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
+	begin := combinator.Satisfy(func(b byte) bool {
+		return b == '['
+	})
+	end := combinator.Satisfy(func(b byte) bool {
+		return b == ']'
+	})
+	separator := combinator.Satisfy(func(b byte) bool {
+		return b == ','
+	})
 	element := parseJSONValue
 	contents := combinator.Separated1(element, separator)
 	p := combinator.Map(combinator.Delimited(begin, contents, end), func(v []jsonValue) (jsonValue, error) {

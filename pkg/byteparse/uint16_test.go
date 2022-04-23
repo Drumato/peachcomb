@@ -31,7 +31,7 @@ import (
 )
 
 func TestUInt16(t *testing.T) {
-	i := []byte{}
+	i := byteparse.NewCompleteInput([]byte{})
 	p := byteparse.UInt16(binary.BigEndian)
 	_, _, err := p(i)
 	assert.Error(t, err)

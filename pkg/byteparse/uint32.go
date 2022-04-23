@@ -32,11 +32,14 @@ import (
 // user can determine the behavior of this parser by giving byteorder what you want to use.
 func UInt32(byteorder binary.ByteOrder) parser.Parser[byte, uint32] {
 	return func(input parser.ParseInput[byte]) (parser.ParseInput[byte], uint32, parser.ParseError) {
-		if len(input) < 4 {
-			return nil, 0, &parser.NoLeftInputToParseError{}
+		buf := make([]byte, 4)
+
+		n, err := input.Read(buf)
+		if err != nil || n < 4 {
+			return input, 0, &parser.NoLeftInputToParseError{}
 		}
 
-		v := byteorder.Uint32(input)
-		return input[4:], v, nil
+		v := byteorder.Uint32(buf)
+		return input, v, nil
 	}
 }

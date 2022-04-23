@@ -41,10 +41,6 @@ func Many1[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO]) parser
 // many is the actual implementation of Many0/1.
 func many[E comparable, SO parser.ParseOutput](sub parser.Parser[E, SO], min uint) parser.Parser[E, []SO] {
 	return func(input parser.ParseInput[E]) (parser.ParseInput[E], []SO, parser.ParseError) {
-		if len(input) == 0 {
-			return input, nil, &parser.NoLeftInputToParseError{}
-		}
-
 		count := 0
 		output := make([]SO, 0)
 		rest := input

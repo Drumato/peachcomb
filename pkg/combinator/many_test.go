@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/Drumato/peachcomb/pkg/combinator"
+	"github.com/Drumato/peachcomb/pkg/strparse"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,6 +36,7 @@ func TestMany1SubFailureOnFirstApplication(t *testing.T) {
 	})
 	p := combinator.Many1(subP)
 
-	_, _, err := p([]rune("bbbbb"))
+	i := strparse.NewCompleteInput("bbbbb")
+	_, _, err := p(i)
 	assert.Error(t, err)
 }

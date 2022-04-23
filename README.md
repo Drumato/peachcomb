@@ -11,7 +11,16 @@ currently this library is so simple. you only should follow 2 steps as below.
 - initializes `parser.Parser[I, O]`
 - call the parser
 
-## Example
+## Examples
+
+### (WIP) JSON Parser
+
+```shell
+$ go run ./examples/jsonparser/ examples/jsonparser/example.json
+{[{[a b] 2} {[c d] 2} {[e f] 2}] 3}
+```
+
+### Simplest Case
 
 ```go
 package main
@@ -25,8 +34,9 @@ func main() {
 	element := strparse.Digit1()
 	separator := strparse.Rune('|')
 	p := combinator.Separated1(element, separator)
-	i, o, err := p([]rune("123|456|789Drumato"))
-	fmt.Println(i)
+
+	i := strparse.NewCompleteInput("123|456|789Drumato")
+	_, o, err := p(i)
 	fmt.Printf("%d\n", len(o))
 	fmt.Printf("%s %s %s\n", o[0], o[1], o[2])
 	fmt.Println(err)
@@ -35,7 +45,6 @@ func main() {
 
 ```shell
 $ go run main.go
-Drumato
 3
 123 456 789
 <nil>

@@ -25,12 +25,13 @@ package main
 import (
 	"testing"
 
+	"github.com/Drumato/peachcomb/pkg/byteparse"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestParseJSONStringValue(t *testing.T) {
-	i, o, err := parseJSONStringValue([]rune("\"Drumato\""))
+	i := byteparse.NewCompleteInput([]byte("\"Drumato\""))
+	_, o, err := parseJSONStringValue(i)
 	assert.NoError(t, err)
 	assert.Equal(t, jsonValueString("Drumato"), o)
-	assert.Equal(t, "", string(i))
 }

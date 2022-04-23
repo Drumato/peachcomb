@@ -30,37 +30,34 @@ import (
 )
 
 func ExampleUInt8() {
-	i, o, err := byteparse.UInt8()([]byte{0x01, 0x02, 0x03})
-	fmt.Println(i)
+	b := byteparse.NewCompleteInput([]byte{0x01, 0x02, 0x03})
+	_, o, err := byteparse.UInt8()(b)
 	fmt.Println(o)
 	fmt.Println(err)
 	// Output:
 	//
-	// [2 3]
 	// 1
 	// <nil>
 }
 
 func ExampleUInt16() {
-	i, o, err := byteparse.UInt16(binary.BigEndian)([]byte{0x01, 0x02, 0x03})
-	fmt.Println(i)
+	b := byteparse.NewCompleteInput([]byte{0x01, 0x02, 0x03})
+	_, o, err := byteparse.UInt16(binary.BigEndian)(b)
 	fmt.Printf("0x%x\n", o)
 	fmt.Println(err)
 	// Output:
 	//
-	// [3]
 	// 0x102
 	// <nil>
 }
 
 func ExampleUInt32() {
-	i, o, err := byteparse.UInt32(binary.BigEndian)([]byte{0x01, 0x02, 0x03, 0x04})
-	fmt.Println(i)
+	b := byteparse.NewCompleteInput([]byte{0x01, 0x02, 0x03, 0x04})
+	_, o, err := byteparse.UInt32(binary.BigEndian)(b)
 	fmt.Printf("0x%x\n", o)
 	fmt.Println(err)
 	// Output:
 	//
-	// []
 	// 0x1020304
 	// <nil>
 }
@@ -68,13 +65,12 @@ func ExampleUInt32() {
 func ExampleTag() {
 	t := []byte{0x7f, 0x45, 0x4c, 0x46}
 
-	i, o, err := byteparse.Tag(t)([]byte{0x7f, 0x45, 0x4c, 0x46, 0x02})
-	fmt.Println(i)
+	b := byteparse.NewCompleteInput([]byte{0x7f, 0x45, 0x4c, 0x46, 0x02})
+	_, o, err := byteparse.Tag(t)(b)
 	fmt.Printf("%d\n", len(o))
 	fmt.Printf("%x %x %x %x\n", o[0], o[1], o[2], o[3])
 	fmt.Println(err)
 	// Output:
-	// [2]
 	// 4
 	// 7f 45 4c 46
 	// <nil>

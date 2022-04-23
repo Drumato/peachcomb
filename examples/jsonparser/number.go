@@ -27,14 +27,16 @@ import (
 
 	"github.com/Drumato/peachcomb/pkg/combinator"
 	"github.com/Drumato/peachcomb/pkg/parser"
-	"github.com/Drumato/peachcomb/pkg/strparse"
 )
 
 type jsonValueInteger int
 
-func parseJSONNumberValue(input parser.ParseInput[rune]) (parser.ParseInput[rune], jsonValue, parser.ParseError) {
-	p := combinator.Map(strparse.Digit1(), func(s string) (jsonValue, error) {
-		v, err := strconv.ParseInt(s, 10, 64)
+func parseJSONNumberValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
+	digit1 := combinator.Many1(combinator.Satisfy(func(b byte) bool {
+		return '0' <= b && b <= '9'
+	}))
+	p := combinator.Map(digit1, func(s []byte) (jsonValue, error) {
+		v, err := strconv.ParseInt(string(s), 10, 64)
 		return jsonValueInteger(v), err
 	})
 
