@@ -26,16 +26,18 @@ import (
 	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-// Complete
+// CompleteInput holds the whole bytes.
 type CompleteInput struct {
 	bytes  []byte
 	offset int
 }
 
+// NewCompleteInput initialiizes a CompleteInput.
 func NewCompleteInput(bytes []byte) *CompleteInput {
 	return &CompleteInput{bytes: bytes}
 }
 
+// Read implements parser.ParseInput interface.
 func (c *CompleteInput) Read(buf []byte) (int, error) {
 	if c.offset >= len(c.bytes) {
 		return 0, &parser.NoLeftInputToParseError{}
@@ -47,6 +49,7 @@ func (c *CompleteInput) Read(buf []byte) (int, error) {
 	return len(buf), nil
 }
 
+// Seek implements parser.ParseInput interface.
 func (c *CompleteInput) Seek(n int, mode parser.SeekMode) (int, error) {
 	switch mode {
 	case parser.SeekModeStart:

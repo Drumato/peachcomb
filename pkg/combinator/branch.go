@@ -49,17 +49,18 @@ func Branches[E comparable, O parser.ParseOutput](rules map[E]parser.Parser[E, O
 			return input, o, err
 		}
 
-		sub, ok := rules[buf[0]]
+		subP, ok := rules[buf[0]]
 		if !ok {
 			return input, o, &parser.NoLeftInputToParseError{}
 		}
 
+		// recover the consumed head of the input stream
 		_, err = input.Seek(storedOffset, parser.SeekModeStart)
 		if err != nil {
 			return input, o, err
 		}
 
-		return sub(input)
+		return subP(input)
 	}
 }
 
