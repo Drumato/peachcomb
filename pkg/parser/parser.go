@@ -24,21 +24,25 @@ package parser
 
 import "io"
 
-// Parser is an abstract parser that parses any slices.
-// input must be a slice of certain type that implements comparable builtin interface.
+// Parser is an abstract parser.
 type Parser[E comparable, O ParseOutput] func(input ParseInput[E]) (ParseInput[E], O, ParseError)
 
 // ParseInput is the input of Parser interface.
-// It's just a slice of [E comparable].
 type ParseInput[E comparable] interface {
+	// Read reads len(slice) and returns the length that the parser could read.
 	Read([]E) (int, error)
+	// Seek conditions the offset of the input.
 	Seek(int, SeekMode) (int, error)
 }
 
+// SeekMode specifies the behavior of Seek() method.
+// It's similar to io.SeekMode.
 type SeekMode int
 
 const (
-	SeekModeStart   SeekMode = io.SeekStart
+	// SeekModeStart indicates the Seek() method seeks from the start of the input.
+	SeekModeStart SeekMode = io.SeekStart
+	// SeekModeCurrent indicates the Seek() method seeks from the current offset of the input.
 	SeekModeCurrent SeekMode = io.SeekCurrent
 	// SeekModeEnd     SeekMode = io.SeekEnd
 )

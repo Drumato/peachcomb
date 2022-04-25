@@ -45,6 +45,7 @@ func Alt[E comparable, O parser.ParseOutput](parsers ...parser.Parser[E, O]) par
 				return subI, subO, nil
 			}
 
+			// recover from subP's failure
 			_, err = input.Seek(storedOffset, parser.SeekModeStart)
 			if err != nil {
 				return subI, subO, nil

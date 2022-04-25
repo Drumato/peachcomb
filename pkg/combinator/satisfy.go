@@ -46,6 +46,7 @@ func Satisfy[E comparable](pred Predicate[E]) parser.Parser[E, E] {
 
 		notSatisfied := !pred(buf[0])
 		if notSatisfied {
+			// recover the consumed head of the input stream.
 			input.Seek(storedOffset, parser.SeekModeStart)
 			return input, e, &NotSatisfiedError[E]{actual: e}
 		}

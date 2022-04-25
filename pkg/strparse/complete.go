@@ -26,16 +26,18 @@ import (
 	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-// Complete
+// CompleteInput holds the whole runes.
 type CompleteInput struct {
 	runes  []rune
 	offset int
 }
 
+// NewCompleteInput initialiizes a CompleteInput.
 func NewCompleteInput(s string) *CompleteInput {
 	return &CompleteInput{runes: []rune(s)}
 }
 
+// Read implements parser.ParseInput interface.
 func (c *CompleteInput) Read(buf []rune) (int, error) {
 	if c.offset >= len(c.runes) {
 		return 0, &parser.NoLeftInputToParseError{}
@@ -47,6 +49,7 @@ func (c *CompleteInput) Read(buf []rune) (int, error) {
 	return len(buf), nil
 }
 
+// Seek implements parser.ParseInput interface.
 func (c *CompleteInput) Seek(n int, mode parser.SeekMode) (int, error) {
 	switch mode {
 	case parser.SeekModeStart:
