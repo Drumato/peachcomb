@@ -29,6 +29,25 @@ import (
 )
 
 type jsonObjectValue struct {
+	Fields []jsonObjectField
+}
+
+// parseJSONObjectValue parses a JSON object.
+func parseJSONObjectValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
+	begin := byteparse.Tag([]byte("{"))
+	end := combinator.Preceded(parseJSONWhitespace, byteparse.Tag([]byte("}")))
+	emptyObject := combinator.Map(combinator.Twin(begin, end), func(res combinator.TwinResult[[]byte, []byte]) (jsonValue, error) {
+		return jsonObjectValue{Fields: make([]jsonObjectField, 0)}, nil
+	})
+
+	fields := parseJSONObjectFieldList
+	rawObject := combinator.Delimited(begin, fields, end)
+	object := combinator.Map(rawObject, func(fields []jsonObjectField) (jsonValue, error) {
+		return jsonObjectValue{Fields: fields}, nil
+	})
+
+	p := combinator.Alt(emptyObject, object)
+	return p(input)
 }
 
 type jsonObjectField struct {
@@ -36,12 +55,18 @@ type jsonObjectField struct {
 	Value jsonValue
 }
 
+func parseJSONObjectFieldList(input parser.ParseInput[byte]) (parser.ParseInput[byte], []jsonObjectField, parser.ParseError) {
+	comma := combinator.Delimited(parseJSONWhitespace, byteparse.Tag([]byte(",")), parseJSONWhitespace)
+	p := combinator.Separated1(parseJSONObjectField, comma)
+	return p(input)
+}
+
 // parseJSONObjectField parses a field of the JSON object
 // object_field := string whitespace ":" value
-func parseJSONObjectField(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonObjectField, error) {
+func parseJSONObjectField(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonObjectField, parser.ParseError) {
 	rawName := parseJSONStringValue
 	ws := parseJSONWhitespace
-	nameWS := combinator.Terminated(rawName, ws)
+	nameWS := combinator.Delimited(ws, rawName, ws)
 	colon := byteparse.Tag([]byte(":"))
 	nameP := combinator.Terminated(nameWS, colon)
 	p := combinator.Twin(nameP, parseJSONValue)

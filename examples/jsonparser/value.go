@@ -37,8 +37,9 @@ func parseJSONValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jso
 	contents := combinator.Alt(
 		parseJSONStringValue,
 		parseJSONNumberValue,
-		parseJSONArrayValue,
 		parseJSONBooleanValue,
+		parseJSONArrayValue,
+		parseJSONObjectValue,
 	)
 	end := parseJSONWhitespace
 	p := combinator.Delimited(begin, contents, end)

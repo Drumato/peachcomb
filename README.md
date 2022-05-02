@@ -13,8 +13,7 @@ Go Parser Combinator with Go Generics.
 - [x] string parser
 - [x] bytes parser
 - [ ] examples
-  - [ ] JSON parser
-  - [ ] HTTP parser
+  - [x] JSON parser
   - [ ] tiny tree-walked interpreter
 
 ## How to use
@@ -26,11 +25,11 @@ currently this library is so simple. you only should follow 2 steps as below.
 
 ## Examples
 
-### (WIP) JSON Parser
+### JSON Parser
 
 ```shell
 $ go run ./examples/jsonparser/ examples/jsonparser/example.json
-{[{[a b] 2} {[c d] 2} {[e f] 2}] 3}
+{[{Go 1.18} {Nested {[{Empty {[]}} {Python 3.10.4}]}} {2darray {[{[a b] 2} {[c d] 2} {[e f] 2}] 3}}]}
 ```
 
 ### Simplest Case
