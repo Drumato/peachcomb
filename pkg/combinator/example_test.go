@@ -195,3 +195,20 @@ func ExampleBranches() {
 	// 0x00 0x01 0x00 0x01
 	// <nil>
 }
+
+func ExampleSequence() {
+	a := strparse.Rune('a')
+	b := strparse.Rune('b')
+	c := strparse.Rune('c')
+	p := combinator.Sequence([]parser.Parser[rune, rune]{a, b, c})
+
+	i := strparse.NewCompleteInput("abc")
+	_, o, err := p(i)
+	fmt.Println(len(o))
+	fmt.Printf("%c %c %c\n", o[0], o[1], o[2])
+	fmt.Println(err)
+	// Output:
+	// 3
+	// a b c
+	// <nil>
+}
