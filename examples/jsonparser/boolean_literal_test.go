@@ -23,24 +23,21 @@
 package main
 
 import (
-	"github.com/Drumato/peachcomb/pkg/combinator"
-	"github.com/Drumato/peachcomb/pkg/parser"
+	"testing"
+
+	"github.com/Drumato/peachcomb/pkg/byteparse"
+	"github.com/stretchr/testify/assert"
 )
 
-type jsonValue interface {
+func TestParseJSONBooleanValue_True(t *testing.T) {
+	i := byteparse.NewCompleteInput([]byte("true"))
+	_, o, err := parseJSONBooleanValue(i)
+	assert.NoError(t, err)
+	assert.Equal(t, jsonValueBoolean(true), o)
 }
-
-// parseJSONValue parses the json value.
-// value := whitespace_opt (string | number | array) whitespace_opt
-func parseJSONValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
-	begin := parseJSONWhitespace
-	contents := combinator.Alt(
-		parseJSONStringValue,
-		parseJSONNumberValue,
-		parseJSONArrayValue,
-		parseJSONBooleanValue,
-	)
-	end := parseJSONWhitespace
-	p := combinator.Delimited(begin, contents, end)
-	return p(input)
+func TestParseJSONBooleanValue_False(t *testing.T) {
+	i := byteparse.NewCompleteInput([]byte("false"))
+	_, o, err := parseJSONBooleanValue(i)
+	assert.NoError(t, err)
+	assert.Equal(t, jsonValueBoolean(false), o)
 }

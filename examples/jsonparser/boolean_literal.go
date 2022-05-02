@@ -23,24 +23,33 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/Drumato/peachcomb/pkg/byteparse"
 	"github.com/Drumato/peachcomb/pkg/combinator"
 	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-type jsonValue interface {
-}
+type jsonValueBoolean bool
 
-// parseJSONValue parses the json value.
-// value := whitespace_opt (string | number | array) whitespace_opt
-func parseJSONValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
-	begin := parseJSONWhitespace
-	contents := combinator.Alt(
-		parseJSONStringValue,
-		parseJSONNumberValue,
-		parseJSONArrayValue,
-		parseJSONBooleanValue,
-	)
-	end := parseJSONWhitespace
-	p := combinator.Delimited(begin, contents, end)
+// parseJSONBooleanValue parses the boolean literal.
+// boolean := true | false
+func parseJSONBooleanValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
+	const trueSig = "true"
+	const falseSig = "false"
+	trueP := byteparse.Tag([]byte(trueSig))
+	falseP := byteparse.Tag([]byte(falseSig))
+	p := combinator.Map(combinator.Alt(trueP, falseP), func(s []byte) (jsonValue, error) {
+		switch string(s) {
+		case trueSig:
+			return jsonValueBoolean(true), nil
+		case falseSig:
+			return jsonValueBoolean(false), nil
+		default:
+			// maybe unreachable
+			return nil, fmt.Errorf("unexpected bytes tag '%s'", s)
+		}
+	})
+
 	return p(input)
 }
