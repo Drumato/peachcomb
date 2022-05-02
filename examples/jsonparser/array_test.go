@@ -32,9 +32,9 @@ import (
 func TestParseJSONArrayValue(t *testing.T) {
 	expected := jsonArrayValue{
 		elements: []jsonValue{
-			jsonValueString("foo"),
-			jsonValueString("bar"),
-			jsonValueString("baz"),
+			jsonStringValue("foo"),
+			jsonStringValue("bar"),
+			jsonStringValue("baz"),
 		},
 		length: 3,
 	}
@@ -51,22 +51,22 @@ func TestParseJSONArrayValueWith2d(t *testing.T) {
 		elements: []jsonValue{
 			jsonArrayValue{
 				elements: []jsonValue{
-					jsonValueString("a"),
-					jsonValueString("b"),
+					jsonStringValue("a"),
+					jsonStringValue("b"),
 				},
 				length: 2,
 			},
 			jsonArrayValue{
 				elements: []jsonValue{
-					jsonValueString("c"),
-					jsonValueString("d"),
+					jsonStringValue("c"),
+					jsonStringValue("d"),
 				},
 				length: 2,
 			},
 			jsonArrayValue{
 				elements: []jsonValue{
-					jsonValueString("e"),
-					jsonValueString("f"),
+					jsonStringValue("e"),
+					jsonStringValue("f"),
 				},
 				length: 2,
 			},

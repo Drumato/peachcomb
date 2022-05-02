@@ -27,7 +27,7 @@ import (
 	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-type jsonValueString string
+type jsonStringValue string
 
 func parseJSONStringValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
 	begin := combinator.Satisfy(func(ch byte) bool { return ch == '"' })
@@ -35,7 +35,7 @@ func parseJSONStringValue(input parser.ParseInput[byte]) (parser.ParseInput[byte
 	end := combinator.Satisfy(func(ch byte) bool { return ch == '"' })
 
 	p := combinator.Map(combinator.Delimited(begin, contents, end), func(s []byte) (jsonValue, error) {
-		return jsonValueString(s), nil
+		return jsonStringValue(s), nil
 	})
 
 	return p(input)

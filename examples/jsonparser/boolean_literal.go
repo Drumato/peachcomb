@@ -30,7 +30,7 @@ import (
 	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-type jsonValueBoolean bool
+type jsonBooleanValue bool
 
 // parseJSONBooleanValue parses the boolean literal.
 // boolean := true | false
@@ -42,9 +42,9 @@ func parseJSONBooleanValue(input parser.ParseInput[byte]) (parser.ParseInput[byt
 	p := combinator.Map(combinator.Alt(trueP, falseP), func(s []byte) (jsonValue, error) {
 		switch string(s) {
 		case trueSig:
-			return jsonValueBoolean(true), nil
+			return jsonBooleanValue(true), nil
 		case falseSig:
-			return jsonValueBoolean(false), nil
+			return jsonBooleanValue(false), nil
 		default:
 			// maybe unreachable
 			return nil, fmt.Errorf("unexpected bytes tag '%s'", s)

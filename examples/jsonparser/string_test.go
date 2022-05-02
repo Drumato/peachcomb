@@ -33,5 +33,5 @@ func TestParseJSONStringValue(t *testing.T) {
 	i := byteparse.NewCompleteInput([]byte("\"Drumato\""))
 	_, o, err := parseJSONStringValue(i)
 	assert.NoError(t, err)
-	assert.Equal(t, jsonValueString("Drumato"), o)
+	assert.Equal(t, jsonStringValue("Drumato"), o)
 }

@@ -23,22 +23,38 @@
 package main
 
 import (
-	"strconv"
-
+	"github.com/Drumato/peachcomb/pkg/byteparse"
 	"github.com/Drumato/peachcomb/pkg/combinator"
 	"github.com/Drumato/peachcomb/pkg/parser"
 )
 
-type jsonNumberValue int
+type jsonObjectValue struct {
+}
 
-func parseJSONNumberValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
-	digit1 := combinator.Many1(combinator.Satisfy(func(b byte) bool {
-		return '0' <= b && b <= '9'
-	}))
-	p := combinator.Map(digit1, func(s []byte) (jsonValue, error) {
-		v, err := strconv.ParseInt(string(s), 10, 64)
-		return jsonNumberValue(v), err
-	})
+type jsonObjectField struct {
+	Name  string
+	Value jsonValue
+}
 
-	return p(input)
+// parseJSONObjectField parses a field of the JSON object
+// object_field := string whitespace ":" value
+func parseJSONObjectField(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonObjectField, error) {
+	rawName := parseJSONStringValue
+	ws := parseJSONWhitespace
+	nameWS := combinator.Terminated(rawName, ws)
+	colon := byteparse.Tag([]byte(":"))
+	nameP := combinator.Terminated(nameWS, colon)
+	p := combinator.Twin(nameP, parseJSONValue)
+
+	i, o, err := p(input)
+	if err != nil {
+		return i, jsonObjectField{}, err
+	}
+
+	name, _ := o.One.(jsonStringValue)
+	f := jsonObjectField{
+		Name:  string(name),
+		Value: o.Two,
+	}
+	return i, f, nil
 }

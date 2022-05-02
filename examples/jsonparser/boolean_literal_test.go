@@ -33,11 +33,11 @@ func TestParseJSONBooleanValue_True(t *testing.T) {
 	i := byteparse.NewCompleteInput([]byte("true"))
 	_, o, err := parseJSONBooleanValue(i)
 	assert.NoError(t, err)
-	assert.Equal(t, jsonValueBoolean(true), o)
+	assert.Equal(t, jsonBooleanValue(true), o)
 }
 func TestParseJSONBooleanValue_False(t *testing.T) {
 	i := byteparse.NewCompleteInput([]byte("false"))
 	_, o, err := parseJSONBooleanValue(i)
 	assert.NoError(t, err)
-	assert.Equal(t, jsonValueBoolean(false), o)
+	assert.Equal(t, jsonBooleanValue(false), o)
 }

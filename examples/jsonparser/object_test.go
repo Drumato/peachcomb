@@ -23,22 +23,19 @@
 package main
 
 import (
-	"strconv"
+	"testing"
 
-	"github.com/Drumato/peachcomb/pkg/combinator"
-	"github.com/Drumato/peachcomb/pkg/parser"
+	"github.com/Drumato/peachcomb/pkg/byteparse"
+	"github.com/stretchr/testify/assert"
 )
 
-type jsonNumberValue int
-
-func parseJSONNumberValue(input parser.ParseInput[byte]) (parser.ParseInput[byte], jsonValue, parser.ParseError) {
-	digit1 := combinator.Many1(combinator.Satisfy(func(b byte) bool {
-		return '0' <= b && b <= '9'
-	}))
-	p := combinator.Map(digit1, func(s []byte) (jsonValue, error) {
-		v, err := strconv.ParseInt(string(s), 10, 64)
-		return jsonNumberValue(v), err
-	})
-
-	return p(input)
+func TestParseJSONObjectField(t *testing.T) {
+	expected := jsonObjectField{
+		Name:  "foo",
+		Value: jsonStringValue("bar"),
+	}
+	i := byteparse.NewCompleteInput([]byte(`"foo" : "bar"]`))
+	_, o, err := parseJSONObjectField(i)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, o)
 }
