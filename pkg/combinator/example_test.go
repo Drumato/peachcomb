@@ -212,3 +212,21 @@ func ExampleSequence() {
 	// a b c
 	// <nil>
 }
+
+func ExampleTwin() {
+	one := strparse.Rune('1')
+	two := combinator.Map(strparse.Rune('2'), func(s rune) (string, error) {
+		return "two", nil
+	})
+	p := combinator.Twin(one, two)
+
+	i := strparse.NewCompleteInput("12")
+	_, o, err := p(i)
+	fmt.Println(string(o.One))
+	fmt.Println(o.Two)
+	fmt.Println(err)
+	// Output:
+	// 1
+	// two
+	// <nil>
+}
