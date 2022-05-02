@@ -22,7 +22,9 @@
 
 package combinator
 
-import "github.com/Drumato/peachcomb/pkg/parser"
+import (
+	"github.com/Drumato/peachcomb/pkg/parser"
+)
 
 // Alt initializes a parser that applies all given parsers.
 // if all of them are failed to parse, Alt() parser also returns an error.
@@ -38,8 +40,9 @@ func Alt[E comparable, O parser.ParseOutput](parsers ...parser.Parser[E, O]) par
 
 			storedOffset, err := input.Seek(0, parser.SeekModeCurrent)
 			if err != nil {
-				return subI, subO, nil
+				return subI, subO, err
 			}
+
 			subI, subO, err = subP(input)
 			if err == nil {
 				return subI, subO, nil
@@ -48,7 +51,7 @@ func Alt[E comparable, O parser.ParseOutput](parsers ...parser.Parser[E, O]) par
 			// recover from subP's failure
 			_, err = input.Seek(storedOffset, parser.SeekModeStart)
 			if err != nil {
-				return subI, subO, nil
+				return subI, subO, err
 			}
 		}
 
