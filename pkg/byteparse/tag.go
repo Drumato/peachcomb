@@ -27,6 +27,7 @@ import (
 	"fmt"
 
 	"github.com/Drumato/peachcomb/pkg/parser"
+	"github.com/cockroachdb/errors"
 )
 
 // Tag initializes a parser that checks the input starts with the tag prefix.
@@ -34,7 +35,7 @@ func Tag(tag []byte) parser.Parser[byte, []byte] {
 	return func(input parser.ParseInput[byte]) (parser.ParseInput[byte], []byte, parser.ParseError) {
 		storedOffset, err := input.Seek(0, parser.SeekModeCurrent)
 		if err != nil {
-			return input, nil, err
+			return input, nil, errors.WithStack(err)
 		}
 
 		buf := make([]byte, len(tag))
@@ -42,14 +43,22 @@ func Tag(tag []byte) parser.Parser[byte, []byte] {
 		n, err := input.Read(buf)
 		if err != nil || n < len(tag) {
 			// recover the consumed head of the input stream.
-			input.Seek(storedOffset, parser.SeekModeStart)
+			_, err := input.Seek(storedOffset, parser.SeekModeStart)
+			if err != nil {
+				return input, nil, errors.WithStack(err)
+			}
+
 			return input, nil, &parser.NoLeftInputToParseError{}
 		}
 
 		unmatched := !bytes.HasPrefix(buf, tag)
 		if unmatched {
 			// recover the consumed head of the input stream.
-			input.Seek(storedOffset, parser.SeekModeStart)
+			_, err := input.Seek(storedOffset, parser.SeekModeStart)
+			if err != nil {
+				return input, nil, errors.WithStack(err)
+			}
+
 			return input, nil, &UnexpectedPrefixError{expected: tag}
 		}
 		return input, tag, nil

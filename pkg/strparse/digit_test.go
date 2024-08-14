@@ -23,6 +23,7 @@
 package strparse_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/Drumato/peachcomb/pkg/strparse"
@@ -35,4 +36,18 @@ func TestDigit1Failure(t *testing.T) {
 	i := strparse.NewCompleteInput("aabbccdd11223344")
 	_, _, err := p(i)
 	assert.Error(t, err)
+}
+
+// BenchmarkDigit1 benchmarks the performance of the Digit1 parser.
+func BenchmarkDigit1(b *testing.B) {
+	inputString := strings.Repeat("9", 1000)
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		input := strparse.NewCompleteInput(inputString)
+		_, _, err := strparse.Digit1()(input)
+		if err != nil {
+			b.Fatalf("Failed to parse: %v", err)
+		}
+	}
 }

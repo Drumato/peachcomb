@@ -26,6 +26,7 @@ import (
 	"fmt"
 
 	"github.com/Drumato/peachcomb/pkg/parser"
+	"github.com/cockroachdb/errors"
 )
 
 // Satisfy initializes a parser that checks the head of the input satisfies the predicate.
@@ -35,7 +36,7 @@ func Satisfy[E comparable](pred Predicate[E]) parser.Parser[E, E] {
 
 		storedOffset, err := input.Seek(0, parser.SeekModeCurrent)
 		if err != nil {
-			return input, e, err
+			return input, e, errors.WithStack(err)
 		}
 
 		buf := make([]E, 1)
@@ -47,7 +48,10 @@ func Satisfy[E comparable](pred Predicate[E]) parser.Parser[E, E] {
 		notSatisfied := !pred(buf[0])
 		if notSatisfied {
 			// recover the consumed head of the input stream.
-			input.Seek(storedOffset, parser.SeekModeStart)
+			_, err := input.Seek(storedOffset, parser.SeekModeStart)
+			if err != nil {
+				return input, e, errors.WithStack(err)
+			}
 			return input, e, &NotSatisfiedError[E]{actual: e}
 		}
 
